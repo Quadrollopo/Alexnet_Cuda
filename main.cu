@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include "matrixMul.cu"
 
 using namespace std;
 
@@ -16,10 +15,22 @@ public:
 };
 
 int main() {
-	vector<float> asd;
-	fullLayer a = fullLayer(5, nullptr);
-	fullLayer b = fullLayer(5, &a);
-	b.forward();
+//	fullLayer* layer = new fullLayer(5, nullptr);
+//	for (int i = 0; i < 4; i++){
+//		layer = new fullLayer((i + 2)*2, layer);
+//	}
+	std::vector<float*> x;
+	float y[10];
+	int i, j;
+	for (i=0; i<10; i++)
+		for (j=0; j<10; j++)
+			y[j] = (float) i*10 + j;
+		x.push_back(y);
+	for (i=0; i<10; i++)
+		for (j=0; j<10; j++)
+			std::cout<<x[i][j]<<std::endl;
+
+
 	return 0;
 }
 
