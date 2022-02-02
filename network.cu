@@ -1,16 +1,24 @@
 #include "network.h"
 
 
-void network::addLayer(fullLayer layer_new){
-	layers.push_back(layer_new);
+void Network::addFullLayer(int neurons){
+	int back_neurons;
+	if (layers.empty()) {
+		back_neurons = input_size;
+	}
+	else{
+		back_neurons = layers.back().num_neurons;
+	}
+
+	layers.emplace_back(neurons, layers.back().num_neurons);
 }
 
-network::network(int n_input) {
+Network::Network(int n_input) {
 	input_size = n_input;
 }
 
-shared_ptr<float[]> network::forward(shared_ptr<float[]> input) {
-	for (fullLayer &f : layers){
+float* Network::forward(float input[]) {
+	for (FullLayer &f : layers){
 		input = f.forward(input);
 	}
 	return input;

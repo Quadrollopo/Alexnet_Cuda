@@ -3,16 +3,17 @@
 #define ALEXNET_NETWORK_H
 
 #include <memory>
-#include "fullLayer.h"
-#include "main.cu"
+#include "FullLayer.h"
 
-class network {
-	vector<fullLayer> layers;
+using namespace std;
+
+class Network {
+	vector<FullLayer> layers;
 	int input_size;
 public:
-	network(int n_input);
-	void addLayer(fullLayer layer_new);
-	shared_ptr<float[]> forward(shared_ptr<float[]> input);
+	Network(int n_input);
+	void addFullLayer(int neurons);
+	float* forward(float input[]);
 
 };
 

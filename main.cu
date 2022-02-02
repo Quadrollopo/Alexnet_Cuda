@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
-
+#include "network.h"
+#include "matrixMul.cuh"
 using namespace std;
 
 
@@ -15,10 +16,14 @@ public:
 };
 
 int main() {
-//	fullLayer* layer = new fullLayer(5, nullptr);
-//	for (int i = 0; i < 4; i++){
-//		layer = new fullLayer((i + 2)*2, layer);
-//	}
+	/*
+	Network net(5);
+	net.addFullLayer(4);
+	net.addFullLayer(3);
+	float in[] = {3.0f, 2.0f, 2.0f, 2.0f, 2.0f};
+	float* out = net.forward(in);
+	cout << out;
+	return 0;
 	std::vector<float*> x;
 	float y[10];
 	int i, j;
