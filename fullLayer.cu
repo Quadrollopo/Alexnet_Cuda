@@ -1,9 +1,10 @@
 #include "fullLayer.h"
 
 
-fullLayer::fullLayer(const int num, fullLayer* next) {
-	this->num_neurons = num;
-	this->neurons = new float [num];
+fullLayer::fullLayer(int n_neurons, int n_weights, fullLayer* next) {
+	this->num_neurons = n_neurons;
+	this->weights_len = n_weights;
+	this->neurons = new float[n_neurons];
 	this->nextLayer = next;
 	if(next != nullptr){
 		weigths = new float* [num];

@@ -5,10 +5,12 @@
 
 class fullLayer {
 	int num_neurons;
-	std::unique_ptr<float> neurons;
+    int weights_len;
 	std::unique_ptr<fullLayer> nextLayer;
+    float **neurons;
 public:
-	fullLayer(int num, fullLayer* next);
+	fullLayer(int n_neurons, int n_weights, fullLayer* next);
+    ~fullLayer();
 	std::shared_ptr<float[]> forward(std::shared_ptr<float[]> values);
 };
 
