@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.17)
 project(Alexnet CUDA)
 
 set(CMAKE_CUDA_STANDARD 14)
