@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "network.h"
-#include "matrixMul.cuh"
+//#include "matrixMul.cuh"
 using namespace std;
 
 
@@ -16,7 +16,7 @@ public:
 };
 
 int main() {
-	/*
+
 	Network net(5);
 	net.addFullLayer(4);
 	net.addFullLayer(3);
