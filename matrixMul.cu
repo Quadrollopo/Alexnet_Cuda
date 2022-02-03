@@ -9,7 +9,7 @@
 
 
 
-__global__ void matrixMul(int *a, int *b, int *c, int rc, int col) {
+__global__ void matrixMul(float *a, float *b, float *c, int b_row, int b_col) {
 
     // Block index
     int bx = blockIdx.x;
@@ -38,33 +38,21 @@ void matrix_mul(float *values, float *weights, float *res, int weights_row, int 
 
     float *d_values, *d_weights, *d_res;
 
-    for (int i = 0; i < 3; i++) {
-        cudaMalloc(&d_a[i], 3 * sizeof(int));
-        cudaMemcpy(d_a[i], a1, 3 * sizeof(int), cudaMemcpyHostToDevice);
-    }
-    cudaMalloc(&d_b, 3 * sizeof(int *));
-    for (int i = 0; i < 2; i++) {
-        cudaMalloc(&d_b[i], 2 * sizeof(int));
-        cudaMemcpy(d_b[i], b1, 6 * sizeof(int), cudaMemcpyHostToDevice);
-    }
-    cudaMalloc(&d_c, 4 * sizeof(int *));
-    for (int i = 0; i < 2; i++) {
-        cudaMalloc(&d_c[i], 2 * sizeof(int));
-        cudaMemcpy(d_c[i]
-                , c1, 8 * sizeof(int), cudaMemcpyHostToDevice);
-    }
-*/
-    cudaMalloc(&d_a, 12 * sizeof(int));
-    cudaMalloc(&d_b, 6 * sizeof(int));
-    cudaMalloc(&d_c, 8 * sizeof(int));
-    cudaMemcpy(d_a, a1, 12 * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_b, b1, 6 * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_c, c1, 8 * sizeof(int), cudaMemcpyHostToDevice);
 
-    matrixMul<<<dim3(4,2), 3>>>(d_a,d_b,d_c,3,2);
+    cudaMalloc(&d_values, weights_row * sizeof(float));
+    cudaMalloc(&d_weights, weights_row * weights_col * sizeof(float));
+    cudaMalloc(&d_res, weights_col * sizeof(float));
 
-    cudaMemcpy(&c1, d_c, 8 * sizeof(int), cudaMemcpyDeviceToHost);
-    for(int i=0;i<8;i++)
-        printf("%d ",c1[i]);
+    cudaMemcpy(d_values, values, weights_row * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_weights, weights, weights_row * weights_col * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_res, res, weights_col * sizeof(float), cudaMemcpyHostToDevice);
+
+    matrixMul<<<dim3(1,weights_col), weights_row>>>(d_values,d_weights,d_res,weights_row,weights_col);
+
+    cudaMemcpy(&res, d_res, weights_col * sizeof(float), cudaMemcpyDeviceToHost);
+
+    for(int i=0;i<weights_col;i++)
+        printf("%f ",res[i]);
+
     cudaDeviceReset();
 }

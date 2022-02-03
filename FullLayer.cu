@@ -20,3 +20,7 @@ FullLayer::~FullLayer(){
 void FullLayer::forward(float *values, float *res) {
     matrix_mul(values, this->weights, res, this->weights_len, this->num_neurons);
 }
+
+int FullLayer::getNeurons() {
+    return this->num_neurons;
+}
