@@ -50,7 +50,7 @@ float* matrix_mul(float *values, float *weights, float *bias, int weights_row, i
 
     matrixMul<<<dim3(1,weights_col), weights_row>>>(d_values,d_weights,d_res,weights_row,weights_col);
 
-    cudaMemcpy(&res, d_res, weights_col * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(res, d_res, weights_col * sizeof(float), cudaMemcpyDeviceToHost);
 
     cudaFree(d_values);
     cudaFree(d_weights);
