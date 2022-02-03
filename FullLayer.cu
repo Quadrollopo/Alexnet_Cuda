@@ -17,8 +17,8 @@ FullLayer::~FullLayer(){
 	delete[] this->bias;
 }
 
-void FullLayer::forward(float *values, float *res) {
-    matrix_mul(values, this->weights, res, this->weights_len, this->num_neurons);
+float* FullLayer::forward(float *values) {
+    return matrix_mul(values, this->weights,this->bias, this->weights_len, this->num_neurons);
 }
 
 int FullLayer::getNeurons() {

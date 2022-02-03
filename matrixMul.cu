@@ -29,14 +29,15 @@ __global__ void matrixMul(float *a, float *b, float *c, int b_row, int b_col) {
 /**
  * @param values first matrix (1 x weights_row)
  * @param weights second matrix (weights_row x weights_col as array)
- * @param res results matrix (1 x weights_col)
  * @param weights_row rows of the second matrix
  * @param weights_col column of the second matrix
- * float *values, float *weights, float *res, int weights_row, int weights_col
+ * float *values, float *weights, int weights_row, int weights_col
  */
-void matrix_mul(float *values, float *weights, float *res, int weights_row, int weights_col) {
+float* matrix_mul(float *values, float *weights, float *bias, int weights_row, int weights_col) {
 
     float *d_values, *d_weights, *d_res;
+
+    auto res = new float[weights_col];
 
 
     cudaMalloc(&d_values, weights_row * sizeof(float));
@@ -51,8 +52,17 @@ void matrix_mul(float *values, float *weights, float *res, int weights_row, int 
 
     cudaMemcpy(&res, d_res, weights_col * sizeof(float), cudaMemcpyDeviceToHost);
 
-    for(int i=0;i<weights_col;i++)
+    cudaFree(d_values);
+    cudaFree(d_weights);
+    cudaFree(d_res);
+
+    for(int i=0;i<weights_col;i++){
+        res[i] += bias[i];
         printf("%f ",res[i]);
+    }
+
 
     cudaDeviceReset();
+
+    return res;
 }
