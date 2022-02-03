@@ -11,6 +11,7 @@ public:
 	~FullLayer();
 	float* forward(float *values);
     int getNeurons();
+    float *getActivations();
 	static float reLU(float f);
 	shared_ptr<float[]> backpropagation(shared_ptr<float[]> cost, shared_ptr<float[]> back_neurons);
 private:

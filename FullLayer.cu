@@ -48,6 +48,10 @@ int FullLayer::getNeurons() {
     return this->num_neurons;
 }
 
+float* FullLayer::getActivations() {
+    return this->activations;
+}
+
 shared_ptr<float[]> FullLayer::backpropagation(shared_ptr<float[]> cost, shared_ptr<float[]> back_neurons) {
 
 	return nullptr;
