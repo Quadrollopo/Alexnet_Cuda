@@ -12,6 +12,7 @@ public:
 private:
     int num_neurons;
     int weights_len;
+    float *activations;
 	float *weights;
 	float *bias;
 };
