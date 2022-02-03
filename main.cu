@@ -14,5 +14,10 @@ int main() {
     float *out = net.forward(in);
     for (int i = 0; i < 3; i++)
         cout << out[i] << endl;
+    float* a = new float(3);
+    a[0] = 0;
+    a[1] = 1;
+    a[2] = 0;
+    net.learn(out, a);
     return 0;
 }

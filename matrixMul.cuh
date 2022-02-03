@@ -2,5 +2,5 @@
 #define ALEXNET_MATRIXMUL_H
 
 __global__ void matrixMul(float *a, float *b, float *c, int rc, int col);
-float* matrix_mul(float *values, float *weights, float *bias,  int weights_row, int weights_col);
+float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col);
 #endif

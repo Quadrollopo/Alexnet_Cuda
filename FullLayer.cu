@@ -26,13 +26,13 @@ FullLayer::~FullLayer(){
 }
 
 float FullLayer::reLU(float f){
-	return f > 0 ? f : 0;
+	return f > 0.0f ? f : 0.0f;
 }
 
 float* FullLayer::forward(float *values) {
 	float *val =matrix_mul(values,
 						   this->weights,
-						   this->bias,
+                           1,
 						   this->weights_len,
 						   this->num_neurons);
 	//bias sum
@@ -54,5 +54,5 @@ float* FullLayer::getActivations() {
 
 shared_ptr<float[]> FullLayer::backpropagation(shared_ptr<float[]> cost, shared_ptr<float[]> back_neurons) {
 
-	return nullptr;
+	return prev_layer_derivative; // CHIAMARE DELETE IN NETWORK
 }

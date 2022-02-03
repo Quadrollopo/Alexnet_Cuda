@@ -27,7 +27,7 @@ float* Network::forward(float input[]) {
 
 void Network::learn(float output[], float expected[]) {
 	//Define loss
-	shared_ptr<float[]> cost(new float[getOutputSize()]);
+	float* cost = new float[getOutputSize()];
 	for(int i=0; i<getOutputSize(); i++)
 		cost[i] = (output[i] - expected[i]) * 2;
 	for(int i=layers.size()-1; i>0; i--){
