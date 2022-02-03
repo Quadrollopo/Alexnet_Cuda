@@ -1,26 +1,22 @@
 #include "FullLayer.h"
+#include "matrixMul.cuh"
 #include <memory>
 
 FullLayer::FullLayer(int n_neurons, int linked_neurons) {
+    /**
+     * weights: number of rows = weights_len, number of columns = num_neurons
+     **/
 	this->num_neurons = n_neurons;
-	this->weights_len = n_weights;
-	this->neurons = new float[n_neurons];
-	this->nextLayer = next;
-	if(next != nullptr){
-		weigths = new float* [num];
-		for (int i = 0; i < num; ++i)
-			weigths[i] = new float [nextLayer->num_neurons];
-	}
+	this->weights_len = linked_neurons;
+	this->weights = new float[n_neurons*linked_neurons];
+    this->bias = new float[n_neurons];
 }
 
 FullLayer::~FullLayer(){
-	for (int i = 0; i < this->num_neurons; ++i)
-		delete[] (this->weights[i]);
-	delete[] (this->weights);
-	delete[] bias;
+	delete[] this->weights;
+	delete[] this->bias;
 }
 
-float* FullLayer::forward(float values[]) {
-	//TODO: matrix mul
-	return values;
+void FullLayer::forward(float *values, float *res) {
+    matrix_mul(values, this->weights, res, this->weights_len, this->num_neurons);
 }
