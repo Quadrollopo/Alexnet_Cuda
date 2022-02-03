@@ -9,7 +9,13 @@ FullLayer::FullLayer(int n_neurons, int linked_neurons) {
 	this->num_neurons = n_neurons;
 	this->weights_len = linked_neurons;
 	this->weights = new float[n_neurons*linked_neurons];
+	for (int i=0; i<n_neurons*linked_neurons; i++){
+		weights[i] = 1;
+	}
     this->bias = new float[n_neurons];
+	for (int i=0; i<n_neurons; i++) {
+		bias[i] = 0;
+	}
 }
 
 FullLayer::~FullLayer(){
