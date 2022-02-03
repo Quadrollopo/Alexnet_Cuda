@@ -66,3 +66,4 @@ float* matrix_mul(float *values, float *weights, float *bias, int weights_row, i
 
     return res;
 }
+

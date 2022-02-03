@@ -6,7 +6,7 @@ class FullLayer {
 public:
 	FullLayer(int n_neurons, int linked_neurons);
 	~FullLayer();
-	void forward(float *values, float *res);
+	float* forward(float *values);
     int getNeurons();
 private:
     int num_neurons;
