@@ -30,20 +30,3 @@ int main() {
 
 	return 0;
 }
-
-
-
-fullLayer::fullLayer(const int num, fullLayer* next) {
-	num_neurons = num;
-	neurons = new float [num];
-	nextLayer = next;
-	if(next != nullptr){
-		weigths = new float* [num];
-		for (int i = 0; i < num; ++i)
-			weigths[i] = new float [nextLayer->num_neurons];
-	}
-}
-
-void fullLayer::forward() {
-	nextLayer->neurons[0] = 3;
-}
