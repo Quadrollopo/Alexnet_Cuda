@@ -1,6 +1,5 @@
 // System includes
 #include <stdio.h>
-#include <assert.h>
 
 // CUDA runtime
 #include "matrixMul.cuh"
@@ -18,7 +17,7 @@ __global__ void matrixMul(float *a, float *b, float *c, int b_row, int b_col) {
     // Thread index
     int tx = threadIdx.x;
     if(tx<b_row) {
-        int x = a[bx*b_row+tx] * b[tx*b_col+by];
+        float x = a[bx*b_row+tx] * b[tx*b_col+by];
 
         __syncthreads();
 
@@ -38,6 +37,9 @@ float* matrix_mul(float *values, float *weights, float *bias, int weights_row, i
     float *d_values, *d_weights, *d_res;
 
     auto res = new float[weights_col];
+
+    for(int i=0;i<weights_col;i++)
+        res[i] = 0.0f;
 
 
     cudaMalloc(&d_values, weights_row * sizeof(float));

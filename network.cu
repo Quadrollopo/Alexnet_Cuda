@@ -1,4 +1,5 @@
 #include "network.h"
+#include "FullLayer.h"
 
 
 void Network::addFullLayer(int neurons){
