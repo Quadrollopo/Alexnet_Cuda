@@ -9,7 +9,7 @@
 using namespace std;
 
 class Network {
-	vector<FullLayer> layers;
+	vector<FullLayer*> layers;
 	int input_size;
 public:
 	Network(int n_input);
