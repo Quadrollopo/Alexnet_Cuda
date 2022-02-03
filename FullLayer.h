@@ -13,7 +13,8 @@ public:
     int getNeurons();
     float *getActivations();
 	static float reLU(float f);
-	shared_ptr<float[]> backpropagation(shared_ptr<float[]> cost, shared_ptr<float[]> back_neurons);
+	float* backpropagation(float* cost, float* back_neurons);
+    float FullLayer::Heaviside(float f);
 private:
     int num_neurons;
     int weights_len;

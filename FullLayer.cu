@@ -52,7 +52,23 @@ float* FullLayer::getActivations() {
     return this->activations;
 }
 
-shared_ptr<float[]> FullLayer::backpropagation(shared_ptr<float[]> cost, shared_ptr<float[]> back_neurons) {
+float FullLayer::Heaviside(float f){
+    return f > 0.0f ? 1.0f : 0.0f;
+}
+
+float* FullLayer::backpropagation(float* cost, float* back_neurons) {
+    // other derivatives are obtained in the same way as the bias derivative but using more terms
+    // so we start computing bias derivatives and then use those as baseline for other derivatives
+    auto bias_derivative = new float[this->num_neurons];
+    for(int i = 0; i < this->num_neurons; i++){
+        bias_derivative[i] = Heaviside(this->activations[i])*cost[i];
+    }
+    float* weights_derivatives = matrix_mul(bias_derivative, back_neurons, this->num_neurons, 1, this->weights_len);
+    float* prev_layer_derivative = matrix_mul(this->weights, bias_derivative, this->weights_len, this->num_neurons, 1);
+
+    delete[] bias_derivative;
+    delete[] weights_derivatives;
+
 
 	return prev_layer_derivative; // CHIAMARE DELETE IN NETWORK
 }
