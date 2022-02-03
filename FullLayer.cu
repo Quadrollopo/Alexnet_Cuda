@@ -1,7 +1,4 @@
 #include "FullLayer.h"
-#include "matrixMul.cuh"
-#include <memory>
-#include <random>
 
 FullLayer::FullLayer(int n_neurons, int linked_neurons) {
     /**
@@ -51,7 +48,7 @@ int FullLayer::getNeurons() {
     return this->num_neurons;
 }
 
-float *FullLayer::backpropagation(float *cost) {
+shared_ptr<float[]> FullLayer::backpropagation(shared_ptr<float[]> cost, shared_ptr<float[]> back_neurons) {
 
 	return nullptr;
 }

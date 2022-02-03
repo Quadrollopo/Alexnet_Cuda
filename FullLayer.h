@@ -1,5 +1,9 @@
 #ifndef ALEXNET_FULLLAYER_H
 #define ALEXNET_FULLLAYER_H
+#include "matrixMul.cuh"
+#include <memory>
+#include <random>
+using namespace std;
 
 class FullLayer {
 public:
@@ -8,7 +12,7 @@ public:
 	float* forward(float *values);
     int getNeurons();
 	static float reLU(float f);
-	float* backpropagation(float cost[]);
+	shared_ptr<float[]> backpropagation(shared_ptr<float[]> cost, shared_ptr<float[]> back_neurons);
 private:
     int num_neurons;
     int weights_len;
