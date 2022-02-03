@@ -16,6 +16,3 @@ int main() {
         cout << out[i] << endl;
     return 0;
 }
-
-
-
