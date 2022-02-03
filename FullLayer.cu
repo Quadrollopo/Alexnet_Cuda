@@ -1,6 +1,7 @@
 #include "FullLayer.h"
 #include "matrixMul.cuh"
 #include <memory>
+#include <random>
 
 FullLayer::FullLayer(int n_neurons, int linked_neurons) {
     /**
@@ -9,8 +10,10 @@ FullLayer::FullLayer(int n_neurons, int linked_neurons) {
 	this->num_neurons = n_neurons;
 	this->weights_len = linked_neurons;
 	this->weights = new float[n_neurons*linked_neurons];
+	std::random_device generator;
+	std::normal_distribution<float> weights_rand = std::normal_distribution<float>(0.0f, 0.1f);
 	for (int i=0; i<n_neurons*linked_neurons; i++){
-		weights[i] = 1.0f;
+		weights[i] = weights_rand(generator);
 	}
     this->bias = new float[n_neurons];
 	for (int i=0; i<n_neurons; i++) {
@@ -23,10 +26,28 @@ FullLayer::~FullLayer(){
 	delete[] this->bias;
 }
 
+float FullLayer::reLU(float f){
+	return f > 0 ? f : 0;
+}
+
 float* FullLayer::forward(float *values) {
-    return matrix_mul(values, this->weights,this->bias, this->weights_len, this->num_neurons);
+	float *val =matrix_mul(values,
+						   this->weights,
+						   this->bias,
+						   this->weights_len,
+						   this->num_neurons);
+	//bias sum
+	for(int i=0; i<num_neurons; i++){
+		val[i] += bias[i];
+		val[i] = reLU(val[i]);
+	}
+	return val;
 }
 
 int FullLayer::getNeurons() {
     return this->num_neurons;
+}
+
+float *FullLayer::backpropagation(float *cost) {
+	return nullptr;
 }

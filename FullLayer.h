@@ -1,6 +1,5 @@
 #ifndef ALEXNET_FULLLAYER_H
 #define ALEXNET_FULLLAYER_H
-#include <memory>
 
 class FullLayer {
 public:
@@ -8,6 +7,8 @@ public:
 	~FullLayer();
 	float* forward(float *values);
     int getNeurons();
+	static float reLU(float f);
+	float* backpropagation(float cost[]);
 private:
     int num_neurons;
     int weights_len;

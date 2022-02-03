@@ -1,6 +1,6 @@
 #include "network.h"
 #include "FullLayer.h"
-
+#include <cmath>
 
 void Network::addFullLayer(int neurons){
 	int back_neurons;
@@ -10,10 +10,8 @@ void Network::addFullLayer(int neurons){
 	else{
 		back_neurons = layers.back()->getNeurons();
 	}
-	FullLayer *f = new FullLayer(neurons, back_neurons);
 
-	layers.insert(layers.end(), f);
-//	layers.insert(1, FullLayer(neurons, back_neurons));
+	layers.push_back(new FullLayer(neurons, back_neurons));
 }
 
 Network::Network(int n_input) {
@@ -25,4 +23,16 @@ float* Network::forward(float input[]) {
 		input = f->forward(input);
 	}
 	return input;
+}
+
+void Network::learn(float output[], float expected[]) {
+	//Define lost
+	shared_ptr<float[]> cost(new float[getOutputSize()]);
+	for(int i=0; i<getOutputSize(); i++)
+		cost[i] = (output[i] - expected[i]) * 2;
+
+}
+
+int Network::getOutputSize() {
+	return layers.back()->getNeurons();
 }

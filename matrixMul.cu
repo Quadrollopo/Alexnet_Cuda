@@ -58,11 +58,6 @@ float* matrix_mul(float *values, float *weights, float *bias, int weights_row, i
     cudaFree(d_weights);
     cudaFree(d_res);
 
-    for(int i=0;i<weights_col;i++){
-        res[i] += bias[i];
-        printf("%f ",res[i]);
-    }
-
 
     cudaDeviceReset();
 
