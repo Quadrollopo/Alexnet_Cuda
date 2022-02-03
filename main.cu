@@ -1,7 +1,5 @@
 #include <iostream>
-#include <vector>
 #include "network.h"
-#include "matrixMul.cuh"
 using namespace std;
 
 
@@ -13,11 +11,8 @@ int main() {
     float in[] = {3.0f, 2.0f, 2.5f, 2.0f, 2.0f};
     float *out = net.forward(in);
     for (int i = 0; i < 3; i++)
-        cout << out[i] << endl;
-    float* a = new float(3);
-    a[0] = 0;
-    a[1] = 1;
-    a[2] = 0;
+        cout << out[i] << endl; //46
+    float a[] = {0.0f, 1.0f, 0.0f};
     net.learn(out, a);
     return 0;
 }

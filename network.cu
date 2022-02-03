@@ -33,6 +33,7 @@ void Network::learn(float output[], float expected[]) {
 	for(int i=layers.size()-1; i>0; i--){
 		cost = layers[i]->backpropagation(cost, layers[i-1]->getActivations());
 	}
+	delete[] cost;
 }
 
 int Network::getOutputSize() {
