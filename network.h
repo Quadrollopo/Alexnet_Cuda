@@ -3,6 +3,7 @@
 #define ALEXNET_NETWORK_H
 
 #include <memory>
+#include <vector>
 #include "FullLayer.h"
 
 using namespace std;
