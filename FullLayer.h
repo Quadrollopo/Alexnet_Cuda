@@ -15,12 +15,16 @@ public:
 	static float reLU(float f);
 	float* backpropagation(float* cost, float* back_neurons);
     float FullLayer::Heaviside(float f);
+	void applyGradient(float lr);
 private:
     int num_neurons;
     int weights_len;
     float *activations;
 	float *weights;
 	float *bias;
+	float* bias_derivative;
+	float* weights_derivative;
+	int num_weights;
 };
 
 

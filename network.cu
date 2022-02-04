@@ -14,8 +14,9 @@ void Network::addFullLayer(int neurons){
 	layers.push_back(new FullLayer(neurons, back_neurons));
 }
 
-Network::Network(int n_input) {
+Network::Network(int n_input, float lr) {
 	input_size = n_input;
+	this->lr = lr;
 }
 
 float* Network::forward(float input[]) {
@@ -25,7 +26,7 @@ float* Network::forward(float input[]) {
 	return input;
 }
 
-void Network::learn(float output[], float expected[]) {
+void Network::train(float output[], float expected[], float input[]) {
 	//Define loss
 	float* cost = new float[getOutputSize()];
 	for(int i=0; i<getOutputSize(); i++)
@@ -33,9 +34,16 @@ void Network::learn(float output[], float expected[]) {
 	for(int i=layers.size()-1; i>0; i--){
 		cost = layers[i]->backpropagation(cost, layers[i-1]->getActivations());
 	}
+	cost = layers[0]->backpropagation(cost, input);
 	delete[] cost;
 }
 
 int Network::getOutputSize() {
 	return layers.back()->getNeurons();
+}
+
+void Network::learn() {
+	for (FullLayer *f : layers){
+		f->applyGradient(lr);
+	}
 }

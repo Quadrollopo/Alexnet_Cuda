@@ -57,10 +57,10 @@ float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col) {
     cudaFree(d_b);
     cudaFree(d_c);
 
-    for(int i=0; i < a_row * b_col; i++){
-        printf("%f ", res[i]);
-    }
-    printf("\n\n\n\n");
+//    for(int i=0; i < a_row * b_col; i++){
+//        printf("%f ", res[i]);
+//    }
+//    printf("\n\n\n\n");
 
 
     cudaDeviceReset();
