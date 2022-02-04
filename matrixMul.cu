@@ -8,7 +8,7 @@
 
 
 
-__global__ void matrixMul(float *a, float *b, float *c, int b_row, int b_col) {
+__global__ void matrixMul(float *a, float *b, float *c, int a_row, int b_row, int b_col) {
 
     // Block index
     int bx = blockIdx.x;
@@ -18,7 +18,6 @@ __global__ void matrixMul(float *a, float *b, float *c, int b_row, int b_col) {
     int tx = threadIdx.x;
     if(tx < b_row) {
         float x = a[bx*b_row+tx] * b[tx*b_col+by];
-
         __syncthreads();
 
         atomicAdd(&c[bx*b_col+by], x);
@@ -50,7 +49,7 @@ float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col) {
     cudaMemcpy(d_b, b, b_row * b_col * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_c, res, a_row * b_col * sizeof(float), cudaMemcpyHostToDevice);
 
-    matrixMul<<<dim3(a_row, b_col), b_row>>>(d_a, d_b, d_c, b_row, b_col);
+    matrixMul<<<dim3(a_row, b_col), b_row>>>(d_a, d_b, d_c, a_row, b_row, b_col);
 
     cudaMemcpy(res, d_c, a_row * b_col * sizeof(float), cudaMemcpyDeviceToHost);
 
@@ -61,6 +60,7 @@ float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col) {
     for(int i=0; i < a_row * b_col; i++){
         printf("%f ", res[i]);
     }
+    printf("\n\n\n\n");
 
 
     cudaDeviceReset();
