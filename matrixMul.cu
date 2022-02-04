@@ -38,7 +38,7 @@ float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col) {
 
     auto res = new float[a_row * b_col];
 
-    for(int i=0; i < b_col; i++)
+    for(int i=0; i < a_row * b_col; i++)
         res[i] = 0.0f;
 
 

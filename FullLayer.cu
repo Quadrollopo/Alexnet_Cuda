@@ -10,13 +10,12 @@ FullLayer::FullLayer(int n_neurons, int linked_neurons) {
     this->activations = new float[n_neurons];
 	std::random_device generator;
 	std::normal_distribution<float> weights_rand = std::normal_distribution<float>(0.0f, 0.1f);
-	for (int i=0; i<n_neurons*linked_neurons; i++){
-		weights[i] = weights_rand(generator);
-	}
+	for (int i=0; i<n_neurons*linked_neurons; i++)
+		weights[i] =(float)1; //weights_rand(generator);
+
     this->bias = new float[n_neurons];
-	for (int i=0; i<n_neurons; i++) {
+	for (int i=0; i<n_neurons; i++)
 		bias[i] = 1.0f;
-	}
 }
 
 FullLayer::~FullLayer(){
@@ -64,12 +63,17 @@ float* FullLayer::backpropagation(float* cost, float* back_neurons) {
         bias_derivative[i] = Heaviside(this->activations[i])*cost[i];
     }
 	delete[] cost;
-    float* weights_derivatives = matrix_mul(back_neurons, bias_derivative, this->num_neurons+1, 1, this->num_neurons);
-    float* prev_layer_derivative = matrix_mul(bias_derivative, this->weights, 1, this->num_neurons, this->num_neurons+1);
+
+    for(int i=0; i<this->num_neurons;i++)
+        printf("%f ",bias_derivative[i]);
+    printf("\n\n");
+
+    float* weights_derivatives = matrix_mul( back_neurons ,bias_derivative, this->weights_len, 1, this->num_neurons);
+    float* prev_layer_derivative = matrix_mul(this->weights, bias_derivative, this->weights_len, this->num_neurons, 1);
 
     delete[] bias_derivative;
     delete[] weights_derivatives;
 
 
-	return prev_layer_derivative; // CHIAMARE DELETE IN NETWORK
+	return prev_layer_derivative;
 }
