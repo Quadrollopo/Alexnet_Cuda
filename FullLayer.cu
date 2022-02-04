@@ -52,6 +52,7 @@ float* FullLayer::forward(float *values) {
 	for(int i=0; i<num_neurons; i++){
 		val[i] += bias[i];
 		val[i] = reLU(val[i]);
+//		val[i] = sigmoid(val[i]);
         this->activations[i] = val[i];
 	}
 	return val;

@@ -19,6 +19,17 @@ Network::Network(int n_input, float lr) {
 	this->lr = lr;
 }
 
+float* Network::Softmax(float input[], int length){
+	float sum = 0;
+	for(int i = 0; i < length; i++) {
+		input[i] = exp(input[i]);
+		sum += input[i];
+	}
+	for(int i = 0; i < length; i++)
+		input[i] = input[i]/sum;
+	return input;
+}
+
 float* Network::forward(float input[]) {
 	for (FullLayer *f : layers){
 		input = f->forward(input);

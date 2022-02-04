@@ -27,10 +27,11 @@ __global__ void matrixMul(float *a, float *b, float *c, int a_row, int b_row, in
 /**
  * @param a first matrix (1 x weights_row)
  * @param b second matrix (weights_row x weights_col as array)
+ * @param a_row rows of the first matrix
  * @param b_row rows of the second matrix
  * @param b_col column of the second matrix
  * float *values, float *weights, int weights_row, int weights_col
- */
+ **/
 float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col) {
 
     float *d_a, *d_b, *d_c;
