@@ -1,5 +1,7 @@
 #include "FullLayer.h"
 
+#include <stdexcept>
+
 FullLayer::FullLayer(int n_neurons, int linked_neurons) {
     /**
      * weights: number of rows = weights_len, number of columns = num_neurons
@@ -45,11 +47,7 @@ float der_sigmoid(float f){
 }
 
 float* FullLayer::forward(float *values) {
-	float *val =matrix_mul(values,
-						   this->weights,
-                           1,
-						   this->weights_len,
-						   this->num_neurons);
+	float *val =matrix_mul(values, this->weights, 1, this->weights_len, this->num_neurons);
 	//bias sum
 	for(int i=0; i<num_neurons; i++){
 		val[i] += bias[i];

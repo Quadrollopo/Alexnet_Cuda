@@ -16,6 +16,7 @@ class Network {
 public:
 	Network(int n_input, float lr);
 	void addFullLayer(int neurons);
+	float* Softmax(float input[], int length);
 	float* forward(float input[]);
 	void train(float output[], float expected[], float input[]);
 	void learn();

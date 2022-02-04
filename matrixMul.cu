@@ -68,3 +68,28 @@ float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col) {
     return res;
 }
 
+
+
+/**
+ * @param a first matrix (1 x weights_row)
+ * @param b second matrix (weights_row x weights_col as array)
+ * @param a_row rows of the first matrix
+ * @param b_row rows of the second matrix
+ * @param b_col column of the second matrix
+ * float *values, float *weights, int weights_row, int weights_col
+ */
+float* matrix_mulCPU(float *a, float *b, int a_row, int b_row, int b_col) {
+
+	auto res = new float[a_row * b_col];
+
+	for(int i=0; i < a_row * b_col; i++)
+		res[i] = 0.0f;
+
+	for(int i = 0; i < a_row; i++)
+		for(int j=0; j < b_col; j++)
+			for(int k = 0; k < b_row; k++)
+				res[i*b_col+j] += a[i*b_row+k] * b[k*b_col+j] ;
+
+	return res;
+}
+

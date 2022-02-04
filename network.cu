@@ -23,8 +23,10 @@ float* Network::forward(float input[]) {
 	for (FullLayer *f : layers){
 		input = f->forward(input);
 	}
+	//input = (input,layers.back()->getNeurons());
 	return input;
 }
+
 
 void Network::train(float output[], float expected[], float input[]) {
 	//Define loss
