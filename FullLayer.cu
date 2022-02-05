@@ -1,4 +1,5 @@
 #include "FullLayer.h"
+#include <stdexcept>
 
 FullLayer::FullLayer(int n_neurons, int linked_neurons, bool isReLU) {
     /**
@@ -81,6 +82,7 @@ float* FullLayer::backpropagation(float* cost, float* back_neurons) {
     // other derivatives are obtained in the same way as the bias derivative but using more terms
     // so we start computing bias derivatives and then use those as baseline for other derivatives
 	float* tmp_bias = new float[this->num_neurons];
+    float* weights_derivative_CPU = new float[this->num_weights];
     for(int i = 0; i < this->num_neurons; i++){
         tmp_bias[i] = derivative_func(this->activations[i])*cost[i];
 		bias_derivative[i] += tmp_bias[i];
@@ -91,12 +93,16 @@ float* FullLayer::backpropagation(float* cost, float* back_neurons) {
     float* prev_layer_derivative = matrix_mulCPU(tmp_bias, this->weights, 1, this->num_neurons, this->weights_len);
 
 	delete[] tmp_bias;
-	//TODO: Da fare in CUDA
-	for (int i=0; i<num_weights; i++){
-		weights_derivative[i] += res[i];
-	}
-	delete[] res;
 
+//	for (int i=0; i<num_weights; i++){
+//		weights_derivative[i] += res[i];
+//	}
+    weights_derivative = vector_sum(weights_derivative,res,num_weights);
+    weights_derivative_CPU = vector_sumCPU(weights_derivative,res,num_weights);
+    cmp(weights_derivative,weights_derivative_CPU,num_weights);
+
+	delete[] res;
+    delete[] tmp_weights_derivative;
 	return prev_layer_derivative;
 }
 
@@ -109,4 +115,11 @@ void FullLayer::applyGradient(float lr) {
 		bias[i] -= bias_derivative[i] * lr;
 		bias_derivative[i] = 0;
 	}
+}
+
+void cmp(float *a, float *b, int len){
+    for(int i=0; i<len; i++){
+        if(a[i] != b[i])
+            throw std::invalid_argument("Sum doesn't work");
+    }
 }
