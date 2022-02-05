@@ -1,5 +1,5 @@
-#include "network.h"
-#include "FullLayer.h"
+#include "network.cuh"
+#include "FullLayer.cuh"
 #include <cmath>
 
 void Network::addFullLayer(int neurons, bool relu){

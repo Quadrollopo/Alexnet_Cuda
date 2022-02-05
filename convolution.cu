@@ -1,14 +1,7 @@
-// System includes
-#include <stdio.h>
-
-// CUDA runtime
-#include "matrixMul.cuh"
+#include "convolution.cuh"
 #include <cuda_runtime.h>
 
-
-
-
-__global__ void matrix_mul_CUDA(float *a, float *b, float *c, int a_row, int b_row, int b_col) {
+__global__ void convolution_CUDA(float *a, float *b, float *c, int a_row, int b_row, int b_col) {
 
     // Block index
     int bx = blockIdx.x;
@@ -32,7 +25,7 @@ __global__ void matrix_mul_CUDA(float *a, float *b, float *c, int a_row, int b_r
  * @param b_col column of the second matrix
  * float *values, float *weights, int weights_row, int weights_col
  **/
-float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col) {
+float* convolution(float *a, float *b, int a_row, int b_row, int b_col) {
 
     float *d_a, *d_b, *d_c;
 
@@ -50,7 +43,7 @@ float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col) {
     cudaMemcpy(d_b, b, b_row * b_col * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_c, res, a_row * b_col * sizeof(float), cudaMemcpyHostToDevice);
 
-    matrix_mul_CUDA<<<dim3(a_row, b_col), b_row>>>(d_a, d_b, d_c, a_row, b_row, b_col);
+    convolution_CUDA<<<dim3(a_row, b_col), b_row>>>(d_a, d_b, d_c, a_row, b_row, b_col);
 
     cudaMemcpy(res, d_c, a_row * b_col * sizeof(float), cudaMemcpyDeviceToHost);
 
@@ -79,18 +72,17 @@ float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col) {
  * @param b_col column of the second matrix
  * float *values, float *weights, int weights_row, int weights_col
  */
-float* matrix_mul_CPU(float *a, float *b, int a_row, int b_row, int b_col) {
+float* convolution_CPU(float *a, float *b, int a_row, int b_row, int b_col) {
 
-	auto res = new float[a_row * b_col];
+    auto res = new float[a_row * b_col];
 
-	for(int i=0; i < a_row * b_col; i++)
-		res[i] = 0.0f;
+    for(int i=0; i < a_row * b_col; i++)
+        res[i] = 0.0f;
 
-	for(int i = 0; i < a_row; i++)
-		for(int j=0; j < b_col; j++)
-			for(int k = 0; k < b_row; k++)
-				res[i*b_col+j] += a[i*b_row+k] * b[k*b_col+j] ;
+    for(int i = 0; i < a_row; i++)
+        for(int j=0; j < b_col; j++)
+            for(int k = 0; k < b_row; k++)
+                res[i*b_col+j] += a[i*b_row+k] * b[k*b_col+j] ;
 
-	return res;
+    return res;
 }
-

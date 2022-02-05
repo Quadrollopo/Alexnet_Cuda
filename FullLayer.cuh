@@ -1,7 +1,7 @@
-#ifndef ALEXNET_FULLLAYER_H
-#define ALEXNET_FULLLAYER_H
+#ifndef ALEXNET_FULLLAYER_CUH
+#define ALEXNET_FULLLAYER_CUH
 #include "matrixMul.cuh"
-#include "vectorSum.cuh."
+#include "vectorSum.cuh"
 #include <memory>
 #include <random>
 using namespace std;
@@ -33,4 +33,4 @@ private:
 };
 
 
-#endif //ALEXNET_FULLLAYER_H
+#endif //ALEXNET_FULLLAYER_CUH

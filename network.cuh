@@ -1,10 +1,10 @@
 
-#ifndef ALEXNET_NETWORK_H
-#define ALEXNET_NETWORK_H
+#ifndef ALEXNET_NETWORK_CUH
+#define ALEXNET_NETWORK_CUH
 
 #include <memory>
 #include <vector>
-#include "FullLayer.h"
+#include "FullLayer.cuh"
 
 using namespace std;
 
@@ -23,4 +23,4 @@ public:
 };
 
 
-#endif //ALEXNET_NETWORK_H
+#endif //ALEXNET_NETWORK_CUH
