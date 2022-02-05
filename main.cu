@@ -33,6 +33,17 @@ int main() {
 		net.learn();
 		cout <<"loss: " << loss / BATCH_SIZE << endl;
 	}
+	int hit = 0;
+	for (int i = 0; i < NUM_TEST; i++) {
+//		int x = distribution(r);
+		int x = i;
+		float a[2] = {in[0][x] , in[1][x]};
+		out = net.forward(a);
+		if(out[0] > sol[x] - 0.25f && out[0] < sol[x] + 0.25f){
+			hit++;
+		}
+	}
+	cout <<"Test: " << (float) hit/ NUM_TEST << endl;
 
     return 0;
 }
