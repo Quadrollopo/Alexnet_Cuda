@@ -112,8 +112,8 @@ float* FullLayer::backpropagation(float* cost, float* back_neurons) {
     weights_derivative_CPU = vector_sum_CPU(weights_derivative, current_weights_derivative, num_weights);
     cmp(weights_derivative,weights_derivative_CPU,num_weights);
 
-	delete[] res;
-    delete[] tmp_weights_derivative;
+	delete[] current_weights_derivative;
+    delete[] weights_derivative_CPU;
 	return prev_layer_derivative;
 }
 
@@ -129,9 +129,3 @@ void FullLayer::applyGradient(float lr) {
 	}
 }
 
-void cmp(float *a, float *b, int len){
-    for(int i=0; i<len; i++){
-        if(a[i] != b[i])
-            throw std::invalid_argument("Sum doesn't work");
-    }
-}

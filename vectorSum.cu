@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 // CUDA runtime
-#include "vectorSum.cuh."
+#include "vectorSum.cuh"
 #include <cuda_runtime.h>
 
 
