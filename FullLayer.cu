@@ -99,7 +99,7 @@ float* FullLayer::backpropagation(float* cost, float* back_neurons) {
 		bias_derivative[i] += current_bias_derivative[i];
     }
 	delete[] cost;
-//    float* res = matrix_mul(back_neurons, tmp_bias, this->weights_len, 1, this->num_neurons);
+//    float* current_weights_derivative = matrix_mul(back_neurons, tmp_bias, this->weights_len, 1, this->num_neurons);
 	float* current_weights_derivative = matrix_mul_CPU(back_neurons, current_bias_derivative, this->weights_len, 1, this->num_neurons);
     float* prev_layer_derivative = matrix_mul_CPU(current_bias_derivative, this->weights, 1, this->num_neurons, this->weights_len);
 
