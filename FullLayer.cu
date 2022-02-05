@@ -1,8 +1,6 @@
 #include "FullLayer.h"
 
-#include <stdexcept>
-
-FullLayer::FullLayer(int n_neurons, int linked_neurons) {
+FullLayer::FullLayer(int n_neurons, int linked_neurons, bool isReLU) {
     /**
      * weights: number of rows = weights_len, number of columns = num_neurons
      **/
@@ -13,9 +11,17 @@ FullLayer::FullLayer(int n_neurons, int linked_neurons) {
 	this->weights_derivative = new float[num_weights];
     this->activations = new float[n_neurons];
 	std::random_device generator;
-	std::normal_distribution<float> weights_rand = std::normal_distribution<float>(0.0f, 0.1f);
+	std::normal_distribution<float> weights_rand = std::normal_distribution<float>(0.0f, 1.f);
+	if(isReLU) {
+		activation_func = reLU;
+		derivative_func = Heaviside;
+	}
+	else {
+		activation_func = sigmoid;
+		derivative_func = der_sigmoid;
+	}
 	for (int i=0; i<n_neurons*linked_neurons; i++){
-		weights[i] = weights_rand(generator);
+		weights[i] = 1.f;
 		weights_derivative[i] = 0.0f;
 	}
     this->bias = new float[n_neurons];
@@ -38,11 +44,11 @@ float FullLayer::reLU(float f){
 	return f > 0.0f ? f : 0.0f;
 }
 
-float sigmoid(float f){
+float FullLayer::sigmoid(float f){
 	return 1.f/ (1.f + exp(-f));
 }
 
-float der_sigmoid(float f){
+float FullLayer::der_sigmoid(float f){
 	return f*(1 - f);
 }
 
@@ -51,10 +57,10 @@ float* FullLayer::forward(float *values) {
 	//bias sum
 	for(int i=0; i<num_neurons; i++){
 		val[i] += bias[i];
-		val[i] = reLU(val[i]);
-//		val[i] = sigmoid(val[i]);
+		val[i] = activation_func(val[i]);
         this->activations[i] = val[i];
 	}
+	//TODO: memory leakage in val
 	return val;
 }
 
@@ -76,8 +82,7 @@ float* FullLayer::backpropagation(float* cost, float* back_neurons) {
     // so we start computing bias derivatives and then use those as baseline for other derivatives
 	float* tmp_bias = new float[this->num_neurons];
     for(int i = 0; i < this->num_neurons; i++){
-//		tmp_bias[i] = der_sigmoid(this->activations[i])*cost[i];
-        tmp_bias[i] = Heaviside(this->activations[i])*cost[i];
+        tmp_bias[i] = derivative_func(this->activations[i])*cost[i];
 		bias_derivative[i] += tmp_bias[i];
     }
 	delete[] cost;

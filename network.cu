@@ -2,7 +2,7 @@
 #include "FullLayer.h"
 #include <cmath>
 
-void Network::addFullLayer(int neurons){
+void Network::addFullLayer(int neurons, bool relu){
 	int back_neurons;
 	if (layers.empty()) {
 		back_neurons = input_size;
@@ -11,7 +11,7 @@ void Network::addFullLayer(int neurons){
 		back_neurons = layers.back()->getNeurons();
 	}
 
-	layers.push_back(new FullLayer(neurons, back_neurons));
+	layers.push_back(new FullLayer(neurons, back_neurons, relu));
 }
 
 Network::Network(int n_input, float lr) {

@@ -15,7 +15,7 @@ class Network {
 	int getOutputSize();
 public:
 	Network(int n_input, float lr);
-	void addFullLayer(int neurons);
+	void addFullLayer(int neurons, bool relu = true);
 	float* Softmax(float input[], int length);
 	float* forward(float input[]);
 	void train(float output[], float expected[], float input[]);

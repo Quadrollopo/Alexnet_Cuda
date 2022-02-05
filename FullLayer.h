@@ -7,16 +7,18 @@ using namespace std;
 
 class FullLayer {
 public:
-	FullLayer(int n_neurons, int linked_neurons);
+	FullLayer(int n_neurons, int linked_neurons, bool isReLU = true);
 	~FullLayer();
-	float* forward(float *values);
     int getNeurons();
-    float *getActivations();
-	static float reLU(float f);
+	float* forward(float *values);
+    float* getActivations();
 	float* backpropagation(float* cost, float* back_neurons);
-    float FullLayer::Heaviside(float f);
 	void applyGradient(float lr);
 private:
+	static float reLU(float f);
+    static float Heaviside(float f);
+	static float sigmoid(float f);
+	static float der_sigmoid(float f);
     int num_neurons;
     int weights_len;
     float *activations;
@@ -25,6 +27,8 @@ private:
 	float* bias_derivative;
 	float* weights_derivative;
 	int num_weights;
+	float (*activation_func)(float);
+	float (*derivative_func)(float);
 };
 
 
