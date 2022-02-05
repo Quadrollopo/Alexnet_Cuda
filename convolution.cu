@@ -1,7 +1,8 @@
 #include "convolution.cuh"
 #include <cuda_runtime.h>
+#include <iostream>
 
-__global__ void convolution_CUDA(float *a, float *b, float *c, int a_row, int b_row, int b_col) {
+__global__ void convolution_CUDA(float *image, float *kernel, float *res, int image_size, int kernel_size, int stride, int pad) {
 
     // Block index
     int bx = blockIdx.x;
@@ -13,7 +14,7 @@ __global__ void convolution_CUDA(float *a, float *b, float *c, int a_row, int b_
         float x = image[] * kernel[tx];
         __syncthreads(); //??
 
-        atomicAdd(&c[bx*b_col+by], x);
+        atomicAdd(&res[], x);
     }
 
 }
@@ -23,7 +24,6 @@ __global__ void convolution_CUDA(float *a, float *b, float *c, int a_row, int b_
  * @param a_row rows of the first matrix
  * @param b_row rows of the second matrix
  * @param b_col column of the second matrix
- * float *values, float *weights, int weights_row, int weights_col
  **/
 float* convolution(float *image, float *kernel, int image_size, int kernel_size, int stride, int pad) {
     if(kernel_size % 2 == 0){
