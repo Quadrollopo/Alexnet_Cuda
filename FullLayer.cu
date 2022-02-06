@@ -41,18 +41,6 @@ FullLayer::~FullLayer(){
     delete[] this->bias_derivative;
 }
 
-float FullLayer::reLU(float f){
-	return f > 0.0f ? f : 0.0f;
-}
-
-float FullLayer::sigmoid(float f){
-	return 1.f/ (1.f + exp(-f));
-}
-
-float FullLayer::der_sigmoid(float f){
-	return f*(1 - f);
-}
-
 float* FullLayer::forward(float *values) {
 	float *val =matrix_mul(values, this->weights, 1, this->weights_len, this->num_neurons);
     delete[] values;
@@ -71,15 +59,6 @@ int FullLayer::getNeurons() {
 
 float* FullLayer::getActivations() {
     return this->activations;
-}
-
-float FullLayer::Heaviside(float f){
-    return f > 0.0f ? 1.0f : 0.0f;
-}
-
-double sech2(float x) {
-    float sh = 1.0 / std::cosh(x);   // sech(x) == 1/cosh(x)
-    return sh*sh;                     // sech^2(x)
 }
 
 void cmp(float *a, float *b, int len){

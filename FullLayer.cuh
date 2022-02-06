@@ -2,6 +2,7 @@
 #define ALEXNET_FULLLAYER_CUH
 #include "matrixMul.cuh"
 #include "vectorSum.cuh"
+#include "utils.cuh"
 #include <memory>
 #include <random>
 using namespace std;
@@ -16,10 +17,6 @@ public:
 	float* backpropagation(float* cost, float* back_neurons);
 	void applyGradient(float lr);
 private:
-	static float reLU(float f);
-    static float Heaviside(float f);
-	static float sigmoid(float f);
-	static float der_sigmoid(float f);
     int num_neurons;
     int weights_len;
     float *activations;
