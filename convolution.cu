@@ -84,17 +84,22 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
  * @param b_col column of the second matrix
  * float *values, float *weights, int weights_row, int weights_col
  */
-float* convolution_CPU(float *a, float *b, int a_row, int b_row, int b_col, int size, int stride, int pad) {
+float* convolution_CPU(float *image, float *kernel, int kern_size, int img_size, int stride, int pad) {
 
-    auto res = new float[a_row * b_col];
+	int kern_len = kern_size * kern_size;
 
-    for(int i=0; i < a_row * b_col; i++)
-        res[i] = 0.0f;
+	float* res = new float [(img_size - 1)*(img_size - 1)];
 
-    for(int i = 0; i < a_row; i++)
-        for(int j=0; j < b_col; j++)
-            for(int k = 0; k < b_row; k++)
-                res[i*b_col+j] += a[i*b_row+k] * b[k*b_col+j] ;
+	for (int x=0; x < img_size - kern_size + 1; x+=img_size){
+		for (int y=0; y < img_size - kern_size + 1; y++) {
+			float sum = 0;
+			for(int i=0; i<kern_size; i+=kern_size){
+				for(int j=0; i<kern_size; j++){
+					sum += kernel[i + j] * image[x + y];
+				}
+			}
+		}
+	}
 
     return res;
 }
