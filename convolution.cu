@@ -10,8 +10,11 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
 
     // Thread index
     int tx = threadIdx.x;
-    if(tx < kernel_size * kernel_size) { // Ha senso tenere kernel_size o è più comodo riceverlo già moltiplicato?
-        float x = image[] * kernel[tx];
+    if(tx < kernel_size * kernel_size) {
+        int start = bx * image_size + by;
+        int index = start + (int)tx/kernel_size + tx % kernel_size;
+        int image_x = bx * stride - (kernel_size - 1)/2 ;
+        int image_y = by * stride - (kernel_size - 1)/2 ;
         __syncthreads(); //??
 
         atomicAdd(&res[], x);
@@ -36,7 +39,7 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
     }
 
     float *d_image, *d_kernel, *d_res;
-    auto res_dim = (image_size-kernel_size+2*pad)/(stride+1);
+    auto res_dim = (image_size-kernel_size+2*pad)/stride+1;
     auto res = new float[res_dim * res_dim];
 
     for(int i=0; i < res_dim * res_dim; i++)
