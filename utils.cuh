@@ -19,7 +19,18 @@ static float der_sigmoid(float f) {
 	return f * (1 - f);
 }
 
-static double sech2(float x) {
-	float sh = 1.0f / std::cosh(x);   // sech(x) == 1/cosh(x)
+static double sech2(float f) {
+	float sh = 1.0f / std::cosh(f);   // sech(x) == 1/cosh(x)
 	return sh*sh;                     // sech^2(x)
+}
+
+float* Softmax(float input[], int length){
+	float sum = 0;
+	for(int i = 0; i < length; i++) {
+		input[i] = exp(input[i]);
+		sum += input[i];
+	}
+	for(int i = 0; i < length; i++)
+		input[i] = input[i]/sum;
+	return input;
 }
