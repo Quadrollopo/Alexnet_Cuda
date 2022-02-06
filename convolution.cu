@@ -24,9 +24,10 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
 /**
  * @param image first matrix
  * @param kernel second matrix
- * @param a_row rows of the first matrix
- * @param b_row rows of the second matrix
- * @param b_col column of the second matrix
+ * @param image_size size of image
+ * @param kernel_size size of kernel
+ * @param stride
+ * @param pad
  **/
 float* convolution(float *image, float *kernel, int image_size, int kernel_size, int stride, int pad) {
     if(kernel_size % 2 == 0){
