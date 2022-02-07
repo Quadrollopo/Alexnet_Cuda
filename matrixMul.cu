@@ -50,7 +50,7 @@ float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col) {
     cudaMemcpy(d_b, b, b_row * b_col * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_c, res, a_row * b_col * sizeof(float), cudaMemcpyHostToDevice);
 
-    matrix_mul_CUDA<<<dim3(a_row, b_col), b_row+1050>>>(d_a, d_b, d_c, a_row, b_row, b_col);
+    matrix_mul_CUDA<<<dim3(a_row, b_col), b_row>>>(d_a, d_b, d_c, a_row, b_row, b_col);
 
     cudaMemcpy(res, d_c, a_row * b_col * sizeof(float), cudaMemcpyDeviceToHost);
 
