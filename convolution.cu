@@ -10,18 +10,31 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
 
     // Thread index
     int tx = threadIdx.x;
-    if(tx < kernel_size * kernel_size) {
-        int kernel_left = bx * stride - pad;
+    int ty = threadIdx.y;
+    if(tx * kernel_size + ty < kernel_size * kernel_size) {
+
+        //controllare bx e by
+        int kernel_left = by * stride - pad;
         int kernel_right = kernel_left + kernel_size - 1;
-        int kernel_up = by * stride - pad;
+        int kernel_up = bx * stride - pad;
         int kernel_down = kernel_up + kernel_size - 1;
-        int start = bx * image_size + by;
-        int index = start + (int)tx/kernel_size + tx % kernel_size;
-        int image_x = bx * stride - (kernel_size - 1)/2 ;
-        int image_y = by * stride - (kernel_size - 1)/2 ;
+
+        float x;
+
+        if((kernel_left < 0 && ty < pad) || //padding a sinistra
+        (kernel_right >= image_size && ty >= kernel_size - pad) || //padding a destra
+        (kernel_up < 0 && tx < pad) || //padding sopra
+        (kernel_down >= image_size && tx >= kernel_size - pad)) //padding sotto
+            x = 0.0f;
+
+        else{
+            int index = ( kernel_up + (kernel_size - 1)/2 ) * image_size + ( kernel_left + (kernel_size - 1)/2 ); // indice centrale
+            int offset =  index + ( tx - (kernel_size - 1)/2) * image_size + ty - (kernel_size - 1)/2; // offset da aggiungere  o sottrarre
+            x = image[index+offset] * kernel[tx * kernel_size + ty] / (float)kernel_size;
+        }
         __syncthreads(); //??
 
-        atomicAdd(&res[], x);
+        atomicAdd(&res[by*res_dim + bx], x);
     }
 
 }
