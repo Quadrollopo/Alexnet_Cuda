@@ -2,7 +2,7 @@
 #include <cuda_runtime.h>
 #include <iostream>
 
-__global__ void convolution_CUDA(float *image, float *kernel, float *res, int image_size, int kernel_size, int stride, int pad) {
+__global__ void convolution_CUDA(float *image, float *kernel, float *res, int image_size, int kernel_size, int stride, int pad, int res_dim) {
 
     // Block index
     int bx = blockIdx.x;
@@ -72,7 +72,7 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
     cudaMemcpy(d_kernel, kernel, kernel_size * kernel_size * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_res, res, res_dim * res_dim * sizeof(float), cudaMemcpyHostToDevice);
 
-    convolution_CUDA<<<dim3(res_dim, res_dim), kernel_size * kernel_size>>>(d_image, d_kernel, d_res, image_size, kernel_size, stride, pad);
+    convolution_CUDA<<<dim3(res_dim, res_dim), kernel_size * kernel_size>>>(d_image, d_kernel, d_res, image_size, kernel_size, stride, pad, res_dim);
 
     cudaMemcpy(res, d_res, res_dim * res_dim * sizeof(float), cudaMemcpyDeviceToHost);
 
