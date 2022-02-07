@@ -11,6 +11,10 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
     // Thread index
     int tx = threadIdx.x;
     if(tx < kernel_size * kernel_size) {
+        int kernel_left = bx * stride - pad;
+        int kernel_right = kernel_left + kernel_size - 1;
+        int kernel_up = by * stride - pad;
+        int kernel_down = kernel_up + kernel_size - 1;
         int start = bx * image_size + by;
         int index = start + (int)tx/kernel_size + tx % kernel_size;
         int image_x = bx * stride - (kernel_size - 1)/2 ;
