@@ -33,7 +33,7 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
         }
         __syncthreads(); //??
 
-        atomicAdd(&res[by*res_dim + bx], x);
+        atomicAdd(&res[bx*res_dim + by], x);
     }
 
 }
@@ -118,8 +118,8 @@ float* convolution_CPU(float *image, float *kernel, int kern_size, int img_size,
 		for (int y=0; y < res_size; y++) {
 			int res_index = x * res_size + y;
 			res[res_index] = 0;
-            int x_image = x * stride - pad;
-            int y_image = y * stride - pad;
+            int x_image = x * stride - pad_size;
+            int y_image = y * stride - pad_size;
 			for(int i=0; i<kern_size; i++){
 				for(int j=0; j<kern_size; j++){
 					if(x_image + i < 0
