@@ -5,6 +5,7 @@
 #include "utils.cuh"
 #include <memory>
 #include <random>
+#include <stdexcept>
 using namespace std;
 
 class FullLayer {

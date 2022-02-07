@@ -1,5 +1,4 @@
 #include "FullLayer.cuh"
-#include <stdexcept>
 
 FullLayer::FullLayer(int n_neurons, int linked_neurons, bool isReLU) {
     /**
@@ -12,7 +11,7 @@ FullLayer::FullLayer(int n_neurons, int linked_neurons, bool isReLU) {
 	this->weights_derivative = new float[num_weights];
     this->activations = new float[n_neurons];
 	std::random_device generator;
-	std::normal_distribution<float> weights_rand = std::normal_distribution<float>(0.0f, 1.f);
+	std::uniform_real_distribution<float> weights_rand = std::uniform_real_distribution<float>(0.0f, 1.f);
 	if(isReLU) {
 		activation_func = reLU;
 		derivative_func = Heaviside;
@@ -22,7 +21,8 @@ FullLayer::FullLayer(int n_neurons, int linked_neurons, bool isReLU) {
 		derivative_func = der_sigmoid;
 	}
 	for (int i=0; i<n_neurons*linked_neurons; i++){
-		weights[i] = 1.f;
+		weights[i] = weights_rand(generator);
+//		weights[i] = 1.0f;
 		weights_derivative[i] = 0.0f;
 	}
     this->bias = new float[n_neurons];

@@ -1,6 +1,4 @@
 #include "network.cuh"
-#include "FullLayer.cuh"
-#include <cmath>
 
 void Network::addFullLayer(int neurons, bool relu){
 	int back_neurons;

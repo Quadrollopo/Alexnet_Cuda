@@ -24,7 +24,7 @@ static double sech2(float f) {
 	return sh*sh;                     // sech^2(x)
 }
 
-float* Softmax(float input[], int length){
+static float* Softmax(float input[], int length){
 	float sum = 0;
 	for(int i = 0; i < length; i++) {
 		input[i] = exp(input[i]);
