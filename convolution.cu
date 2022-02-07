@@ -28,8 +28,8 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
 
         else{
             int index = ( kernel_up + (kernel_size - 1)/2 ) * image_size + ( kernel_left + (kernel_size - 1)/2 ); // indice centrale
-            int offset =  index + ( tx - (kernel_size - 1)/2) * image_size + ty - (kernel_size - 1)/2; // offset da aggiungere  o sottrarre
-            x = image[index+offset] * kernel[tx * kernel_size + ty] / (float)kernel_size;
+            int offset = ( tx - (kernel_size - 1)/2) * image_size + ty - (kernel_size - 1)/2; // offset da aggiungere  o sottrarre
+            x = image[index+offset] * kernel[tx * kernel_size + ty];
         }
         __syncthreads(); //??
 
@@ -79,10 +79,11 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
     cudaFree(d_kernel);
     cudaFree(d_res);
 
-//    for(int i=0; i < a_row * b_col; i++){
-//        printf("%f ", res[i]);
+//    printf("convolution GPU:\n");
+//    for(int i=0; i < res_dim * res_dim; i++){
+//        printf("%.2f ", res[i]);
 //    }
-//    printf("\n\n\n\n");
+//    printf("\n\n\n");
 
 
     cudaDeviceReset();

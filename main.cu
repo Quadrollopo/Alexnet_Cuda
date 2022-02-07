@@ -1,5 +1,6 @@
 #include <iostream>
 #include "network.cuh"
+#include "convolution.cuh"
 #include <cmath>
 #include <random>
 
@@ -41,5 +42,21 @@ int main() {
 	}
 	cout <<"Test: " << (float) hit/ NUM_TEST << endl;
     */
+    int image_size = 5;
+    int kernel_size = 3;
+    int pad = 1;
+    int stride = 2;
+    auto image = new float[image_size*image_size];
+    auto kernel = new float[kernel_size*kernel_size];
+    auto res_dim = (image_size-kernel_size+2*pad)/stride+1;
+    for(int i=0;i<image_size*image_size;i++)
+        image[i]=(float)i+1;
+    for(int i=0;i<kernel_size*kernel_size;i++)
+        kernel[i]=(float)i+1;
+
+    float* res_CUDA = convolution(image,kernel,image_size,kernel_size,stride,pad);
+    auto res_CPU = convolution_CPU(image,kernel,kernel_size,image_size,stride,true);
+    delete[] res_CUDA;
+    delete[] res_CPU;
     return 0;
 }
