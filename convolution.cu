@@ -79,11 +79,11 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
     cudaFree(d_kernel);
     cudaFree(d_res);
 
-//    printf("convolution GPU:\n");
-//    for(int i=0; i < res_dim * res_dim; i++){
-//        printf("%.2f ", res[i]);
-//    }
-//    printf("\n\n\n");
+    printf("convolution GPU:\n");
+    for(int i=0; i < res_dim * res_dim; i++){
+        printf("%.2f ", res[i]);
+    }
+    printf("\n\n\n");
 
 
     cudaDeviceReset();
@@ -114,15 +114,20 @@ float* convolution_CPU(float *image, float *kernel, int kern_size, int img_size,
 
 	float* res = new float [(res_size)*(res_size)];
 
-	for (int x=0; x < res_size; x+=stride){
-		for (int y=0; y < res_size; y+=stride) {
-			int offset = x * res_size + y;
-			res[offset] = 0;
+	for (int x=0; x < res_size; x++){
+		for (int y=0; y < res_size; y++) {
+			int res_index = x * res_size + y;
+			res[res_index] = 0;
+            int x_image = x * stride - pad;
+            int y_image = y * stride - pad;
 			for(int i=0; i<kern_size; i++){
 				for(int j=0; j<kern_size; j++){
-					if(x + i < pad_size || y + j < pad_size ||x + i > img_size - 1 + pad_size || y + j > img_size - 1 + pad_size)
+					if(x_image + i < 0
+                    || y_image + j < 0
+                    || x_image + i > img_size - 1
+                    || y_image + j > img_size - 1)
 						continue;
-					res[offset] += kernel[i * kern_size + j] * image[(i - pad_size) * img_size + offset + j - pad_size];
+					res[res_index] += kernel[i * kern_size + j] * image[(i+x_image) * img_size + j + y_image];
 				}
 			}
 		}
