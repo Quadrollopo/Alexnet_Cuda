@@ -12,7 +12,6 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
     int tx = threadIdx.x;
     int ty = threadIdx.y;
     if(tx * kernel_size + ty < kernel_size * kernel_size) {
-
         //controllare bx e by
         int kernel_left = by * stride - pad;
         int kernel_right = kernel_left + kernel_size - 1;
@@ -57,8 +56,8 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
     }
 
     float *d_image, *d_kernel, *d_res;
-    auto res_dim = (image_size-kernel_size+2*pad)/stride+1;
-    auto res = new float[res_dim * res_dim];
+    int res_dim = (image_size-kernel_size+2*pad)/stride+1;
+    float* res = new float[res_dim * res_dim];
 
     for(int i=0; i < res_dim * res_dim; i++)
         res[i] = 0.0f;
@@ -72,7 +71,7 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
     cudaMemcpy(d_kernel, kernel, kernel_size * kernel_size * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_res, res, res_dim * res_dim * sizeof(float), cudaMemcpyHostToDevice);
 
-    convolution_CUDA<<<dim3(res_dim, res_dim), kernel_size * kernel_size>>>(d_image, d_kernel, d_res, image_size, kernel_size, stride, pad, res_dim);
+    convolution_CUDA<<<dim3(res_dim, res_dim), dim3(kernel_size, kernel_size)>>>(d_image, d_kernel, d_res, image_size, kernel_size, stride, pad, res_dim);
 
     cudaMemcpy(res, d_res, res_dim * res_dim * sizeof(float), cudaMemcpyDeviceToHost);
 
@@ -102,17 +101,16 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
  * float *values, float *weights, int weights_row, int weights_col
  */
 float* convolution_CPU(float *image, float *kernel, int kern_size, int img_size, int stride, bool pad) {
+    int pad_size;
+    if(pad) {
+        pad_size = kern_size - 1;
+    }
+    else{
+        pad_size = 0;
+    }
+	int res_size = (img_size - kern_size + pad_size) / stride + 1;
+    pad_size /= 2;
 
-	int res_size = (img_size - kern_size) / stride + 1;
-	int pad_size;
-	if(pad) {
-		pad_size = kern_size - 1;
-		res_size += pad_size;
-		pad_size /= 2;
-	}
-	else{
-		pad_size = 0;
-	}
 	float* res = new float [(res_size)*(res_size)];
 
 	for (int x=0; x < res_size; x+=stride){
@@ -128,6 +126,12 @@ float* convolution_CPU(float *image, float *kernel, int kern_size, int img_size,
 			}
 		}
 	}
+
+    printf("convolution CPU:\n");
+    for(int i=0; i < res_size * res_size; i++){
+        printf("%.2f ", res[i]);
+    }
+    printf("\n\n\n");
 
     return res;
 }

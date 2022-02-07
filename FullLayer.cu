@@ -43,7 +43,7 @@ FullLayer::~FullLayer(){
 
 float* FullLayer::forward(float *values) {
 	float *val =matrix_mul(values, this->weights, 1, this->weights_len, this->num_neurons);
-    delete[] values;
+    //delete[] values;
 	//bias sum
 	for(int i=0; i<num_neurons; i++){
 		val[i] += bias[i];

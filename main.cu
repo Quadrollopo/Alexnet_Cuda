@@ -29,7 +29,7 @@ int main() {
 		net.learn();
 		cout <<"loss: " << loss / BATCH_SIZE << endl;
 	}
-	int hit = 0;
+	//int hit = 0;
 	/*for (int i = 0; i < NUM_TEST; i++) {
 //		int x = distribution(r);
 		int x = i;
