@@ -1,7 +1,7 @@
 #ifndef ALEXNET_FULLLAYER_CUH
 #define ALEXNET_FULLLAYER_CUH
-#include "matrixMul.cuh"
-#include "vectorSum.cuh"
+#include "CUDA/matrixMul.cuh"
+#include "CUDA/vectorSum.cuh"
 #include "utils.cuh"
 #include <memory>
 #include <random>
