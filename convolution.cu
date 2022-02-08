@@ -66,10 +66,7 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
 
     float *d_image, *d_kernel, *d_res;
     int res_dim = (image_size-kernel_size+2*pad)/stride+1;
-    float* res = new float[res_dim * res_dim * kernel_ch];
-
-    for(int i=0; i < res_dim * res_dim * kernel_ch; i++)
-        res[i] = 0.0f;
+    float* res = new float[res_dim * res_dim * kernel_ch]();
 
 
     cudaMalloc(&d_image, image_size * image_size * image_ch * sizeof(float));

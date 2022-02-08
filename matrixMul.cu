@@ -52,11 +52,7 @@ float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col) {
 
     float *d_a, *d_b, *d_c;
 
-    auto res = new float[a_row * b_col];
-
-    for(int i=0; i < a_row * b_col; i++)
-        res[i] = 0.0f;
-
+    auto res = new float[a_row * b_col]();
 
     cudaMalloc(&d_a, a_row * b_row * sizeof(float));
     cudaMalloc(&d_b, b_row * b_col * sizeof(float));

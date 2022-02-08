@@ -1,6 +1,7 @@
 #include <iostream>
 #include "network.cuh"
 #include "convolution.cuh"
+#include "maxPooling.cuh"
 #include <cmath>
 #include <random>
 
@@ -57,8 +58,10 @@ int main() {
         for(int j=0; j<kernel_size*kernel_size; j++)
             kernel[i*kernel_size*kernel_size+j]=(float)i;
 
-    float* res_CUDA = convolution(image,kernel,image_size,kernel_size,stride,pad,image_ch,kernel_ch);
+    //float* conv_CUDA = convolution(image,kernel,image_size,kernel_size,stride,pad,image_ch,kernel_ch);
+    float* res_CUDA = max_pooling(image,image_size,3,2,96);
     auto res_CPU = convolution_CPU(image,kernel,kernel_size,image_size,stride,true);
+    //delete[] conv_CUDA;
     delete[] res_CUDA;
     delete[] res_CPU;
     return 0;

@@ -48,19 +48,24 @@ float* max_pooling(float *image, int image_size, int pool_size, int stride, int 
     float* res = new float[res_dim * res_dim * channel]();
 
 
-    cudaMemcpy(d_image, image, image_size * image_size * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_res, res, res_dim * res_dim * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMalloc(&d_image, image_size * image_size * channel * sizeof(float));
+    cudaMalloc(&d_res, res_dim * res_dim * channel * sizeof(float));
+
+    cudaMemcpy(d_image, image, image_size * image_size * channel * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_res, res, res_dim * res_dim * channel * sizeof(float), cudaMemcpyHostToDevice);
 
     max_pooling_CUDA<<<dim3(res_dim, res_dim),channel>>>(d_image,d_res,image_size,pool_size,stride,channel,res_dim);
 
-    cudaMemcpy(res, d_res, res_dim * res_dim * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(res, d_res, res_dim * res_dim * channel * sizeof(float), cudaMemcpyDeviceToHost);
 
     cudaFree(d_image);
     cudaFree(d_res);
 
-    printf("convolution GPU:\n");
-    for(int i=0; i < res_dim * res_dim; i++){
-        printf("%.2f ", res[i]);
+    printf("max pooling GPU:\n");
+    for(int i=0; i < channel; i++){
+        for(int j=0; j < res_dim * res_dim; j++)
+            printf("%d ", (int)res[i*res_dim*res_dim + j]);
+        printf("\n");
     }
     printf("\n\n\n");
 
