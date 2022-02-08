@@ -10,26 +10,27 @@ using namespace std;
 #define NUM_EPOCHS 300
 
 int main() {
-	random_device r;
-	uniform_int_distribution<int> distribution = uniform_int_distribution<int>(0, 1);
-    Network net(2, 2.0f);
-    net.addFullLayer(2);
-    net.addFullLayer(1);
-	float in[2][4] = {0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f};
-	float exp[4] = {0.0f, 1.0f, 1.0f, 0.0f};
-	float* out;
-	for (int j=0; j < NUM_EPOCHS; j++) {
-		double loss = 0.0;
-		for (int i = 0; i < BATCH_SIZE; i++) {
-			float a[2] = {in[0][i] , in[1][i]};
-			out = net.forward(a);
-			net.train(out, &exp[i], a);
-			loss += pow((out[0] - exp[i]), 2);
-            delete[] out;
-		}
-		net.learn();
-		cout <<"loss: " << loss / BATCH_SIZE << endl;
-	}
+    /*Network net(2, 0.8f);
+    net.addFullLayer(2, true);
+    net.addFullLayer(1, false);
+    float in[2][4] = {0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f};
+    float sol[4] = {0.0f, 1.0f, 1.0f, 0.0f};
+    float* out;
+    for (int j=0; j < NUM_EPOCHS; j++) {
+        double loss = 0.0;
+        for (int i = 0; i < BATCH_SIZE; i++) {
+            int x = i;
+//            int x = distribution(r);
+            float a[2] = {in[0][x] , in[1][x]};
+            out = net.forward(a);
+            net.train(out, &sol[x], a);
+
+            loss += pow((out[0] - sol[x]), 2);
+        }
+        delete[] out;
+        net.learn();
+        cout <<"loss: " << loss / BATCH_SIZE << endl;
+    }
 	//int hit = 0;
 	/*for (int i = 0; i < NUM_TEST; i++) {
 //		int x = distribution(r);
@@ -46,15 +47,17 @@ int main() {
     int kernel_size = 3;
     int pad = 1;
     int stride = 2;
-    auto image = new float[image_size*image_size];
-    auto kernel = new float[kernel_size*kernel_size];
-    auto res_dim = (image_size-kernel_size+2*pad)/stride+1;
-    for(int i=0;i<image_size*image_size;i++)
+    int image_ch = 3;
+    int kernel_ch = 96;
+    auto image = new float[image_size*image_size*image_ch];
+    auto kernel = new float[kernel_size*kernel_size*kernel_ch];
+    for(int i=0;i<image_size*image_size*image_ch;i++)
         image[i]=(float)i+1;
-    for(int i=0;i<kernel_size*kernel_size;i++)
-        kernel[i]=(float)i+1;
+    for(int i=0;i<kernel_ch;i++)
+        for(int j=0; j<kernel_size*kernel_size; j++)
+            kernel[i*kernel_size*kernel_size+j]=(float)i;
 
-    float* res_CUDA = convolution(image,kernel,image_size,kernel_size,stride,pad);
+    float* res_CUDA = convolution(image,kernel,image_size,kernel_size,stride,pad,image_ch,kernel_ch);
     auto res_CPU = convolution_CPU(image,kernel,kernel_size,image_size,stride,true);
     delete[] res_CUDA;
     delete[] res_CPU;

@@ -22,7 +22,7 @@ FullLayer::FullLayer(int n_neurons, int linked_neurons, bool isReLU) {
 	}
 	for (int i=0; i<n_neurons*linked_neurons; i++){
 		weights[i] = weights_rand(generator);
-//		weights[i] = 1.0f;
+// 		weights[i] = 1.0f;
 		weights_derivative[i] = 0.0f;
 	}
     this->bias = new float[n_neurons];
@@ -63,8 +63,10 @@ float* FullLayer::getActivations() {
 
 void cmp(float *a, float *b, int len){
     for(int i=0; i<len; i++){
-        if(a[i] != b[i])
-            throw std::invalid_argument("Sum doesn't work");
+        if(a[i] != b[i]) {
+            printf("Vettori diversi\n\n");
+            return;
+        }
     }
 }
 
@@ -78,18 +80,18 @@ float* FullLayer::backpropagation(float* cost, float* back_neurons) {
 		bias_derivative[i] += current_bias_derivative[i];
     }
 	delete[] cost;
-//    float* current_weights_derivative = matrix_mul(back_neurons, tmp_bias, this->weights_len, 1, this->num_neurons);
-	float* current_weights_derivative = matrix_mul_CPU(back_neurons, current_bias_derivative, this->weights_len, 1, this->num_neurons);
+    float* current_weights_derivative = matrix_mul(back_neurons, current_bias_derivative, this->weights_len, 1, this->num_neurons);
+//	float* current_weights_derivative = matrix_mul_CPU(back_neurons, current_bias_derivative, this->weights_len, 1, this->num_neurons);
     float* prev_layer_derivative = matrix_mul_CPU(this->weights, current_bias_derivative, this->weights_len, this->num_neurons, 1);
 
 	delete[] current_bias_derivative;
 
-//	for (int i=0; i<num_weights; i++){
-//		weights_derivative[i] += res[i];
-//	}
-    vector_sum(weights_derivative, current_weights_derivative, num_weights);
-    weights_derivative_CPU = vector_sum_CPU(weights_derivative, current_weights_derivative, num_weights);
-    cmp(weights_derivative,weights_derivative_CPU,num_weights);
+	for (int i=0; i<num_weights; i++){
+		weights_derivative[i] += current_weights_derivative[i];
+	}
+//    vector_sum(weights_derivative, current_weights_derivative, num_weights);
+//    weights_derivative_CPU = vector_sum_CPU(weights_derivative, current_weights_derivative, num_weights);
+//    cmp(weights_derivative,weights_derivative_CPU,num_weights);
 
 	delete[] current_weights_derivative;
     delete[] weights_derivative_CPU;

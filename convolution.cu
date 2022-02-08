@@ -2,7 +2,7 @@
 #include <cuda_runtime.h>
 #include <iostream>
 
-__global__ void convolution_CUDA(float *image, float *kernel, float *res, int image_size, int kernel_size, int stride, int pad, int res_dim) {
+__global__ void convolution_CUDA(float *image, float *kernel, float *res, int image_size, int kernel_size, int stride, int pad, int res_dim,int image_ch, int kernel_ch) {
 
     // Block index
     int bx = blockIdx.x;
@@ -18,8 +18,7 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
         int kernel_up = bx * stride - pad;
         int kernel_down = kernel_up + kernel_size - 1;
 
-        float x;
-
+        __shared__ float x;
         if((kernel_left < 0 && ty < pad) || //padding a sinistra
         (kernel_right >= image_size && ty >= kernel_size - pad) || //padding a destra
         (kernel_up < 0 && tx < pad) || //padding sopra
@@ -29,11 +28,22 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
         else{
             int index = ( kernel_up + (kernel_size - 1)/2 ) * image_size + ( kernel_left + (kernel_size - 1)/2 ); // indice centrale
             int offset = ( tx - (kernel_size - 1)/2) * image_size + ty - (kernel_size - 1)/2; // offset da aggiungere  o sottrarre
-            x = image[index+offset] * kernel[tx * kernel_size + ty];
-        }
-        __syncthreads(); //??
 
-        atomicAdd(&res[bx*res_dim + by], x);
+            for(int i=0; i<image_ch; i++) {
+                for (int j = 0; j < kernel_ch; j++) {
+                    x = image[index + offset + i*image_size*image_size]  * kernel[tx * kernel_size + ty + j * kernel_size * kernel_size];
+//                    if(bx * res_dim + by + j * res_dim * res_dim == 9)
+//                        printf("%d %d %d %d %d %d %d %d\n", bx, by, tx, ty,
+//                               index + offset + i*image_size*image_size,
+//                               tx * kernel_size + ty + j * kernel_size * kernel_size,
+//                               bx * res_dim + by + j * res_dim * res_dim,
+//                               (int)x);
+
+                    atomicAdd(&res[bx * res_dim + by + j * res_dim * res_dim], x);
+                }
+            }
+        }
+
     }
 
 }
@@ -45,7 +55,7 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
  * @param stride
  * @param pad
  **/
-float* convolution(float *image, float *kernel, int image_size, int kernel_size, int stride, int pad) {
+float* convolution(float *image, float *kernel, int image_size, int kernel_size, int stride, int pad, int image_ch, int kernel_ch) {
     if(kernel_size % 2 == 0){
         std::cout << "Filter size is not odd" << std::endl;
         return nullptr;
@@ -57,23 +67,23 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
 
     float *d_image, *d_kernel, *d_res;
     int res_dim = (image_size-kernel_size+2*pad)/stride+1;
-    float* res = new float[res_dim * res_dim];
+    float* res = new float[res_dim * res_dim * kernel_ch];
 
-    for(int i=0; i < res_dim * res_dim; i++)
+    for(int i=0; i < res_dim * res_dim * kernel_ch; i++)
         res[i] = 0.0f;
 
 
-    cudaMalloc(&d_image, image_size * image_size * sizeof(float));
-    cudaMalloc(&d_kernel, kernel_size * kernel_size * sizeof(float));
-    cudaMalloc(&d_res, res_dim * res_dim * sizeof(float));
+    cudaMalloc(&d_image, image_size * image_size * image_ch * sizeof(float));
+    cudaMalloc(&d_kernel, kernel_size * kernel_size * kernel_ch * sizeof(float));
+    cudaMalloc(&d_res, res_dim * res_dim * kernel_ch * sizeof(float));
 
-    cudaMemcpy(d_image, image, image_size * image_size * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_kernel, kernel, kernel_size * kernel_size * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_res, res, res_dim * res_dim * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_image, image, image_size * image_size * image_ch * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_kernel, kernel, kernel_size * kernel_size * kernel_ch * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_res, res, res_dim * res_dim * kernel_ch * sizeof(float), cudaMemcpyHostToDevice);
 
-    convolution_CUDA<<<dim3(res_dim, res_dim), dim3(kernel_size, kernel_size)>>>(d_image, d_kernel, d_res, image_size, kernel_size, stride, pad, res_dim);
+    convolution_CUDA<<<dim3(res_dim, res_dim), dim3(kernel_size, kernel_size)>>>(d_image, d_kernel, d_res, image_size, kernel_size, stride, pad, res_dim, image_ch,kernel_ch);
 
-    cudaMemcpy(res, d_res, res_dim * res_dim * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(res, d_res, res_dim * res_dim *  kernel_ch * sizeof(float), cudaMemcpyDeviceToHost);
 
     cudaFree(d_image);
     cudaFree(d_kernel);
@@ -91,6 +101,14 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
     return res;
 }
 
+/**
+ * @param a first matrix (1 x weights_row)
+ * @param b second matrix (weights_row x weights_col as array)
+ * @param a_row rows of the first matrix
+ * @param b_row rows of the second matrix
+ * @param b_col column of the second matrix
+ * float *values, float *weights, int weights_row, int weights_col
+ */
 
 
 
