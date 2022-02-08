@@ -79,11 +79,11 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
     cudaFree(d_kernel);
     cudaFree(d_res);
 
-    printf("convolution GPU:\n");
-    for(int i=0; i < res_dim * res_dim; i++){
-        printf("%.2f ", res[i]);
-    }
-    printf("\n\n\n");
+//    printf("convolution GPU:\n");
+//    for(int i=0; i < res_dim * res_dim; i++){
+//        printf("%.2f ", res[i]);
+//    }
+//    printf("\n\n\n");
 
 
     cudaDeviceReset();
@@ -93,51 +93,41 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
 
 
 
-/**
- * @param a first matrix (1 x weights_row)
- * @param b second matrix (weights_row x weights_col as array)
- * @param a_row rows of the first matrix
- * @param b_row rows of the second matrix
- * @param b_col column of the second matrix
- * float *values, float *weights, int weights_row, int weights_col
- */
-float* convolution_CPU(float *image, float *kernel, int kern_size, int img_size, int stride, bool pad) {
-    int pad_size;
-    if(pad) {
-        pad_size = kern_size - 1;
-    }
-    else{
-        pad_size = 0;
-    }
-	int res_size = (img_size - kern_size + pad_size) / stride + 1;
-    pad_size /= 2;
 
+float* convolution_CPU(float *image, float *kernel, int kern_size, int img_size, int stride, bool pad) {
+	int depth = 2;
+	int pad_size;
+	if(pad) {
+		pad_size = (kern_size - 1);
+	}
+	else{
+		pad_size = 0;
+	}
+	int res_size = (img_size + pad_size - kern_size) / stride + 1;
+	pad_size /= 2;
 	float* res = new float [(res_size)*(res_size)];
 
 	for (int x=0; x < res_size; x++){
 		for (int y=0; y < res_size; y++) {
 			int res_index = x * res_size + y;
 			res[res_index] = 0;
-            int x_image = x * stride - pad_size;
-            int y_image = y * stride - pad_size;
-			for(int i=0; i<kern_size; i++){
-				for(int j=0; j<kern_size; j++){
-					if(x_image + i < 0
-                    || y_image + j < 0
-                    || x_image + i > img_size - 1
-                    || y_image + j > img_size - 1)
-						continue;
-					res[res_index] += kernel[i * kern_size + j] * image[(i+x_image) * img_size + j + y_image];
+			int x_image = x * stride - pad_size;
+			int y_image = y * stride - pad_size;
+			for (int i = 0; i < kern_size; i++) {
+				for (int j = 0; j < kern_size; j++) {
+					for (int z=0; z < depth; z++) {
+						if (x_image + i < 0
+							|| y_image + j < 0
+							|| x_image + i > img_size - 1
+							|| y_image + j > img_size - 1)
+							continue;
+						res[res_index] += kernel[i * kern_size + j + z*kern_size*kern_size] *
+								image[(i + x_image) * img_size + j + y_image + z*img_size*img_size];
+					}
 				}
 			}
 		}
 	}
-
-    printf("convolution CPU:\n");
-    for(int i=0; i < res_size * res_size; i++){
-        printf("%.2f ", res[i]);
-    }
-    printf("\n\n\n");
 
     return res;
 }
