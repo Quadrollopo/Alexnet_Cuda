@@ -76,17 +76,22 @@ float* max_pooling(float *image, int image_size, int pool_size, int stride, int 
 }
 
 
-
-/**
- * @param a first matrix (1 x weights_row)
- * @param b second matrix (weights_row x weights_col as array)
- * @param a_row rows of the first matrix
- * @param b_row rows of the second matrix
- * @param b_col column of the second matrix
- * float *values, float *weights, int weights_row, int weights_col
- */
-
-float* max_pooling_CPU(float *image, float *kernel, int kern_size, int img_size, int stride, bool pad) {
-    return nullptr;
+float* max_pooling_CPU(float *image, int pool_size, int img_size, int stride) {
+	int res_size = (img_size - pool_size) / stride + 1;
+	float* res = new float [res_size * res_size];
+	for (int x=0, x_image=0; x < res_size; x++, x_image+=stride){
+		for (int y=0, y_image=0; y < res_size; y++, y_image+=stride) {
+			int res_index = x * res_size + y;
+			res[res_index] = 0;
+			for (int i = 0; i < pool_size; i++) {
+				for (int j = 0; j < pool_size; j++) {
+					int img_index = (x_image + i) * img_size + y_image + j;
+					if(res[res_index] < image[img_index])
+						res[res_index] = image[img_index];
+				}
+			}
+		}
+	}
+    return res;
 
 }
