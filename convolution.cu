@@ -12,7 +12,6 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
     int tx = threadIdx.x;
     int ty = threadIdx.y;
     if(tx * kernel_size + ty < kernel_size * kernel_size) {
-        //controllare bx e by
         int kernel_left = by * stride - pad;
         int kernel_right = kernel_left + kernel_size - 1;
         int kernel_up = bx * stride - pad;
@@ -89,11 +88,13 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
     cudaFree(d_kernel);
     cudaFree(d_res);
 
-//    printf("convolution GPU:\n");
-//    for(int i=0; i < res_dim * res_dim; i++){
-//        printf("%.2f ", res[i]);
-//    }
-//    printf("\n\n\n");
+    printf("convolution GPU:\n");
+    for(int i=0; i < kernel_ch; i++){
+        for(int j=0; j < res_dim * res_dim; j++)
+            printf("%d ", (int)res[i*res_dim*res_dim + j]);
+        printf("\n");
+    }
+    printf("\n\n\n");
 
 
     cudaDeviceReset();

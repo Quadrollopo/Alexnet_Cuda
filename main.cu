@@ -47,7 +47,7 @@ int main() {
     int kernel_size = 3;
     int pad = 1;
     int stride = 2;
-    int image_ch = 3;
+    int image_ch = 96;
     int kernel_ch = 96;
     auto image = new float[image_size*image_size*image_ch];
     auto kernel = new float[kernel_size*kernel_size*kernel_ch];
