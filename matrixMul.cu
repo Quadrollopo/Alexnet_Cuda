@@ -6,6 +6,22 @@
 #include <cuda_runtime.h>
 
 
+__global__ void matrix_mul_CUDA2(float *a, float *b, float *c, const int a_row, int b_row, const int b_col) {
+
+	// Thread index
+	unsigned int tx = threadIdx.x;
+	unsigned int col = tx % b_row;
+	unsigned int row = tx - col;
+	float sum = 0;
+#pragma unroll
+	for (int i=0, j=0; i<b_row; i++, j+=b_col){
+		sum += a[row+i] * b[j+col];
+	}
+	__syncthreads();
+
+	c[tx] = sum;
+
+}
 
 
 __global__ void matrix_mul_CUDA(float *a, float *b, float *c, int a_row, int b_row, int b_col) {
@@ -67,6 +83,37 @@ float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col) {
     cudaDeviceReset();
 
     return res;
+}
+
+float* matrix_mul2(float *a, float *b, int a_row, int b_row, int b_col) {
+
+	float *d_a, *d_b, *d_c;
+
+	auto res = new float[a_row * b_col];
+
+	for(int i=0; i < a_row * b_col; i++)
+		res[i] = 0.0f;
+
+
+	cudaMalloc(&d_a, a_row * b_row * sizeof(float));
+	cudaMalloc(&d_b, b_row * b_col * sizeof(float));
+	cudaMalloc(&d_c, a_row * b_col * sizeof(float));
+
+	cudaMemcpy(d_a, a, a_row * b_row * sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_b, b, b_row * b_col * sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_c, res, a_row * b_col * sizeof(float), cudaMemcpyHostToDevice);
+
+	matrix_mul_CUDA2<<<1, a_row*b_col, a_row*b_col*sizeof(float)>>>(d_a, d_b, d_c, a_row, b_row, b_col);
+
+	cudaMemcpy(res, d_c, a_row * b_col * sizeof(float), cudaMemcpyDeviceToHost);
+
+	cudaFree(d_a);
+	cudaFree(d_b);
+	cudaFree(d_c);
+
+	cudaDeviceReset();
+
+	return res;
 }
 
 
