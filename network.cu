@@ -1,6 +1,6 @@
 #include "network.cuh"
 
-void Network::addFullLayer(int neurons, bool relu){
+void Network::addFullLayer(int neurons, Act func){
 	int back_neurons;
 	if (layers.empty()) {
 		back_neurons = input_size;
@@ -9,7 +9,7 @@ void Network::addFullLayer(int neurons, bool relu){
 		back_neurons = layers.back()->getNeurons();
 	}
 
-	layers.push_back(new FullLayer(neurons, back_neurons, relu));
+	layers.push_back(new FullLayer(neurons, back_neurons, func));
 }
 
 Network::Network(int n_input, float lr) {
@@ -18,7 +18,7 @@ Network::Network(int n_input, float lr) {
 }
 
 float* Network::forward(float input[]) {
-	for (FullLayer *f : layers){
+	for (Layer *f : layers){
 		input = f->forward(input);
 	}
 	//input = (input,layers.back()->getNeurons());
@@ -43,7 +43,7 @@ int Network::getOutputSize() {
 }
 
 void Network::learn() {
-	for (FullLayer *f : layers){
+	for (Layer *f : layers){
 		f->applyGradient(lr);
 	}
 }
