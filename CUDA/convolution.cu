@@ -31,13 +31,6 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
             for(int i=0; i<image_ch; i++) {
                 for (int j = 0; j < kernel_ch; j++) {
                     x = image[index + offset + i*image_size*image_size]  * kernel[tx * kernel_size + ty + j * kernel_size * kernel_size];
-//                    if(bx * res_dim + by + j * res_dim * res_dim == 9)
-//                        printf("%d %d %d %d %d %d %d %d\n", bx, by, tx, ty,
-//                               index + offset + i*image_size*image_size,
-//                               tx * kernel_size + ty + j * kernel_size * kernel_size,
-//                               bx * res_dim + by + j * res_dim * res_dim,
-//                               (int)x);
-
                     atomicAdd(&res[bx * res_dim + by + j * res_dim * res_dim], x);
                 }
             }

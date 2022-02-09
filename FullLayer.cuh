@@ -13,9 +13,9 @@ public:
 	FullLayer(int n_neurons, int linked_neurons, bool isReLU = true);
 	~FullLayer();
     int getNeurons();
-	float* forward(float *values);
-    float* getActivations();
-	float* backpropagation(float* cost, float* back_neurons);
+	float *forward(float *values);
+    float *getActivations();
+	float *backpropagation(float* cost, float* back_neurons);
 	void applyGradient(float lr);
 private:
     int num_neurons;
@@ -23,8 +23,8 @@ private:
     float *activations;
 	float *weights;
 	float *bias;
-	float* bias_derivative;
-	float* weights_derivative;
+	float *bias_derivative;
+	float *weights_derivative;
 	int num_weights;
 	float (*activation_func)(float);
 	float (*derivative_func)(float);
