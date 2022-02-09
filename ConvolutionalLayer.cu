@@ -22,7 +22,14 @@ ConvolutionalLayer::~ConvolutionalLayer(){
 }
 
 float* ConvolutionalLayer::forward(float *image) {
-    auto res = convolution(image, kernel, input_size, kernel_size, stride, pad, input_channel, kernel_channel);
+    auto res = convolution(image,
+                           this->kernel,
+                           this->input_size,
+                           this->kernel_size,
+                           this->stride,
+                           this->pad,
+                           this->input_channel,
+                           this->kernel_channel);
     for(int i = 0; i < output_size * output_size * output_channel; i++)
         res[i] = reLU(res[i]);
     return res;

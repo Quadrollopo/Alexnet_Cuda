@@ -42,7 +42,11 @@ FullLayer::~FullLayer(){
 }
 
 float* FullLayer::forward(float *values) {
-	float *val =matrix_mul(values, this->weights, 1, this->weights_len, this->num_neurons);
+	float *val =matrix_mul(values,
+                           this->weights,
+                           1,
+                           this->weights_len,
+                           this->num_neurons);
     //delete[] values;
 	//bias sum
 	for(int i=0; i<num_neurons; i++){
@@ -80,8 +84,16 @@ float* FullLayer::backpropagation(float* cost, float* back_neurons) {
 		bias_derivative[i] += current_bias_derivative[i];
     }
 	delete[] cost;
-	float* current_weights_derivative = matrix_mul_CPU(current_bias_derivative, back_neurons, this->num_neurons, 1, this->weights_len);
-    float* prev_layer_derivative = matrix_mul_CPU(this->weights, current_bias_derivative, this->weights_len, this->num_neurons, 1);
+	float* current_weights_derivative = matrix_mul_CPU(current_bias_derivative,
+                                                       back_neurons,
+                                                       this->num_neurons,
+                                                       1,
+                                                       this->weights_len);
+    float* prev_layer_derivative = matrix_mul_CPU(this->weights,
+                                                  current_bias_derivative,
+                                                  this->weights_len,
+                                                  this->num_neurons,
+                                                  1);
 
 	delete[] current_bias_derivative;
 

@@ -28,4 +28,4 @@ private:
 };
 
 
-#endif //ALEXNET_CONVOLUTIONAL_CUH
+#endif ALEXNET_CONVOLUTIONAL_CUH
