@@ -39,10 +39,10 @@ __global__ void max_pooling_CUDA(float *image, float *res, int image_size, int p
  **/
 
 float* max_pooling(float *image, int image_size, int pool_size, int stride, int channel) {
-    if(pool_size % 2 == 0){
-        std::cout << "Filter size is not odd" << std::endl;
-        return nullptr;
-    }
+//    if(pool_size % 2 == 0){
+//        std::cout << "Filter size is not odd" << std::endl;
+//        return nullptr;
+//    }
     float *d_image, *d_res;
     int res_dim = (image_size-pool_size)/stride+1;
     float* res = new float[res_dim * res_dim * channel]();
@@ -60,15 +60,6 @@ float* max_pooling(float *image, int image_size, int pool_size, int stride, int 
 
     cudaFree(d_image);
     cudaFree(d_res);
-
-    printf("max pooling GPU:\n");
-    for(int i=0; i < channel; i++){
-        for(int j=0; j < res_dim * res_dim; j++)
-            printf("%d ", (int)res[i*res_dim*res_dim + j]);
-        printf("\n");
-    }
-    printf("\n\n\n");
-
 
     cudaDeviceReset();
 
