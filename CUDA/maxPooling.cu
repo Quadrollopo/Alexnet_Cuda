@@ -76,13 +76,12 @@ float* max_pooling(float *image, int image_size, int pool_size, int stride, int 
 }
 
 
-float* max_pooling_CPU(float *image, int pool_size, int img_size, int stride) {
+float* max_pooling_CPU(float *image, int img_size, int pool_size, int stride, int channel) {
 	int res_size = (img_size - pool_size) / stride + 1;
 	float* res = new float [res_size * res_size];
 	for (int x=0, x_image=0; x < res_size; x++, x_image+=stride){
 		for (int y=0, y_image=0; y < res_size; y++, y_image+=stride) {
 			int res_index = x * res_size + y;
-			res[res_index] = 0;
 			for (int i = 0; i < pool_size; i++) {
 				for (int j = 0; j < pool_size; j++) {
 					int img_index = (x_image + i) * img_size + y_image + j;
