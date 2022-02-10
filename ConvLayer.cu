@@ -15,7 +15,7 @@ ConvLayer::ConvLayer(int input_size, int input_channel, int kernel_size, int ker
     this->pad = pad;
     this->output_size = (input_size-kernel_size+2*pad)/stride+1;
     this->output_channel = kernel_channel;
-    this->kernel = new float[kernel_size*kernel_size*kernel_channel]();
+    this->kernel = new float[kernel_size*kernel_size*input_channel*kernel_channel]();
 }
 
 ConvLayer::~ConvLayer(){

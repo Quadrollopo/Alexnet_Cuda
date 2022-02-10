@@ -17,7 +17,7 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
         int kernel_up = bx * stride - pad;
         int kernel_down = kernel_up + kernel_size - 1;
 
-        __shared__ float x;
+        float x;
         if((kernel_left < 0 && ty < pad) || //padding a sinistra
         (kernel_right >= image_size && ty >= kernel_size - pad) || //padding a destra
         (kernel_up < 0 && tx < pad) || //padding sopra
@@ -28,10 +28,11 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
             int index = ( kernel_up + (kernel_size - 1)/2 ) * image_size + ( kernel_left + (kernel_size - 1)/2 ); // indice centrale
             int offset = ( tx - (kernel_size - 1)/2) * image_size + ty - (kernel_size - 1)/2; // offset da aggiungere  o sottrarre
 
-            for(int i=0; i<image_ch; i++) {
-                for (int j = 0; j < kernel_ch; j++) {
-                    x = image[index + offset + i*image_size*image_size]  * kernel[tx * kernel_size + ty + j * kernel_size * kernel_size];
-                    atomicAdd(&res[bx * res_dim + by + j * res_dim * res_dim], x);
+            for(int i = 0; i < image_ch; i++){
+                for (int j = 0; j < kernel_ch; j++){
+                        x = image[index + offset + i * image_size * image_size]  *
+                                kernel[tx * kernel_size + ty + j * kernel_size * kernel_size * image_ch + i * kernel_size * kernel_size];
+                        atomicAdd(&res[bx * res_dim + by + j * res_dim * res_dim], x);
                 }
             }
         }

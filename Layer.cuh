@@ -22,11 +22,11 @@ protected:
 	int num_weights;
 	float *activations;
 	float *weights;
-	float* weights_derivative;
+	float *weights_derivative;
 	float *bias;
-	float* bias_derivative;
+	float *bias_derivative;
 	float (*activation_func)(float);
 	float (*derivative_func)(float);
 };
 
-#endif //ALEXNET_LAYER_H
+#endif

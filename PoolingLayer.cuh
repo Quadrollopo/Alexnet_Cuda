@@ -22,4 +22,4 @@ private:
 };
 
 
-#endif ALEXNET_POOLING_CUH
+#endif

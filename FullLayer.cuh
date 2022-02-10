@@ -22,4 +22,4 @@ private:
 };
 
 
-#endif //ALEXNET_FULLLAYER_CUH
+#endif

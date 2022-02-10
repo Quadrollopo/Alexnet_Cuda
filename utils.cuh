@@ -33,4 +33,4 @@ static float* Softmax(float input[], int length){
 	return input;
 }
 
-#endif //ALEXNET_UTLIS_H
+#endif

@@ -6,4 +6,4 @@ float* matrix_mul(float *a, float *b, int a_row, int b_row, int b_col);
 float* matrix_mul2(float *a, float *b, int a_row, int b_row, int b_col);
 float* matrix_mul_CPU(float *a, float *b, int a_row, int b_row, int b_col);
 
-#endif+
+#endif
