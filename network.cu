@@ -6,7 +6,7 @@ void Network::addFullLayer(int neurons, Act func){
         num_back_neurons = input_size;
 	}
 	else{
-		back_neurons = layers.back()->getNeurons();
+		num_back_neurons = layers.back()->getNeurons();
 	}
 
 	layers.push_back(new FullLayer(neurons, num_back_neurons, func));

@@ -64,11 +64,11 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
 
 
     cudaMalloc(&d_image, image_size * image_size * image_ch * sizeof(float));
-    cudaMalloc(&d_kernel, kernel_size * kernel_size * kernel_ch * sizeof(float));
+    cudaMalloc(&d_kernel, kernel_size * kernel_size * image_ch * kernel_ch * sizeof(float));
     cudaMalloc(&d_res, res_dim * res_dim * kernel_ch * sizeof(float));
 
     cudaMemcpy(d_image, image, image_size * image_size * image_ch * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_kernel, kernel, kernel_size * kernel_size * kernel_ch * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_kernel, kernel, kernel_size * kernel_size * image_ch * kernel_ch * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_res, res, res_dim * res_dim * kernel_ch * sizeof(float), cudaMemcpyHostToDevice);
 
     convolution_CUDA<<<dim3(res_dim, res_dim), dim3(kernel_size, kernel_size)>>>(d_image, d_kernel, d_res, image_size, kernel_size, stride, pad, res_dim, image_ch,kernel_ch);
