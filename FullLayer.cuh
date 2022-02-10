@@ -19,8 +19,6 @@ public:
 	float* backpropagation(float* cost, float* back_neurons) override;
 	void applyGradient(float lr) override;
 private:
-	float *bias;
-	float* bias_derivative;
 };
 
 

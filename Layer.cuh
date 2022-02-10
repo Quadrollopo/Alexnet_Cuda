@@ -23,6 +23,8 @@ protected:
 	float *activations;
 	float *weights;
 	float* weights_derivative;
+	float *bias;
+	float* bias_derivative;
 	float (*activation_func)(float);
 	float (*derivative_func)(float);
 };
