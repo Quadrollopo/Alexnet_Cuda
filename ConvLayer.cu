@@ -1,11 +1,12 @@
-#include "ConvolutionalLayer.cuh"
+#include "ConvLayer.cuh"
 #include "utils.cuh"
 #include "CUDA/convolution.cuh"
 #include "CUDA/vectorSum.cuh"
 #include <random>
 #include <stdexcept>
 
-ConvolutionalLayer::ConvolutionalLayer(int input_size, int input_channel, int kernel_size, int kernel_channel, int stride, int pad) {
+ConvLayer::ConvLayer(int input_size, int input_channel, int kernel_size, int kernel_channel, int stride, int pad)
+		: Layer(n_neurons, linked_neurons, func){
     this->input_size = input_size;
     this->input_channel = input_channel;
     this->kernel_size = kernel_size;
@@ -17,11 +18,11 @@ ConvolutionalLayer::ConvolutionalLayer(int input_size, int input_channel, int ke
     this->kernel = new float[kernel_size*kernel_size*kernel_channel]();
 }
 
-ConvolutionalLayer::~ConvolutionalLayer(){
+ConvLayer::~ConvLayer(){
     delete[] this->kernel;
 }
 
-float* ConvolutionalLayer::forward(float *image) {
+float* ConvLayer::forward(float *image) {
     auto res = convolution(image,
                            this->kernel,
                            this->input_size,
@@ -35,29 +36,29 @@ float* ConvolutionalLayer::forward(float *image) {
     return res;
 }
 
-int ConvolutionalLayer::getInputSize() {
+int ConvLayer::getInputSize() {
     return this->input_size;
 }
-int ConvolutionalLayer::getInputChannel() {
+int ConvLayer::getInputChannel() {
     return this->input_channel;
 }
-int ConvolutionalLayer::getKernelSize() {
+int ConvLayer::getKernelSize() {
     return this->kernel_size;
 }
-int ConvolutionalLayer::getKernelChannel() {
+int ConvLayer::getKernelChannel() {
     return this->kernel_channel;
 }
-int ConvolutionalLayer::getOutputSize() {
+int ConvLayer::getOutputSize() {
     return this->output_size;
 }
-int ConvolutionalLayer::getOutputChannel() {
+int ConvLayer::getOutputChannel() {
     return this->output_channel;
 }
 
-float* ConvolutionalLayer::backpropagation() {
-    return nullptr;
+void ConvLayer::applyGradient(float lr) {
+
 }
 
-void ConvolutionalLayer::applyGradient() {
+float *ConvLayer::backpropagation(float *cost, float *back_neurons) {
+	return nullptr;
 }
-

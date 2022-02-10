@@ -2,19 +2,21 @@
 #define ALEXNET_CONVOLUTIONAL_CUH
 using namespace std;
 
-class ConvolutionalLayer{
+#include "Layer.cuh"
+
+class ConvLayer: public Layer{
 public:
-    ConvolutionalLayer(int input_size, int input_channel, int kernel_size, int kernel_channel, int stride, int pad);
-    ~ConvolutionalLayer();
+    ConvLayer(int input_size, int input_channel, int kernel_size, int kernel_channel, int stride, bool pad);
+    ~ConvLayer();
     int getInputSize();
     int getInputChannel();
     int getKernelSize();
     int getKernelChannel();
     int getOutputSize();
     int getOutputChannel();
-    float *forward(float *image);
-    float *backpropagation();
-    void applyGradient();
+    float *forward(float *image) override;
+    float *backpropagation(float* cost, float* back_neurons) override;
+    void applyGradient(float lr) override;
 private:
     int input_size;
     int input_channel;
@@ -28,4 +30,4 @@ private:
 };
 
 
-#endif ALEXNET_CONVOLUTIONAL_CUH
+#endif //ALEXNET_CONVOLUTIONAL_CUH
