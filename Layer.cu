@@ -1,16 +1,10 @@
 #include "Layer.cuh"
 
 
-Layer::Layer(int n_neurons, int linked_neurons, Act func) {
+Layer::Layer(Act func) {
 	/**
 	 * weights: number of rows = weights_len, number of columns = num_neurons
 	 **/
-	this->num_neurons = n_neurons;
-	this->num_back_neurons = linked_neurons;
-	this->num_weights = n_neurons*linked_neurons;
-	this->weights = new float[num_weights];
-	this->weights_derivative = new float[num_weights]();
-	this->activations = new float[n_neurons];
 	switch (func) {
 		case reLu:
 			activation_func = reLU;

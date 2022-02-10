@@ -1,8 +1,6 @@
 #ifndef ALEXNET_UTLIS_H
 #define ALEXNET_UTLIS_H
 
-#endif //ALEXNET_UTLIS_H
-
 static float reLU(float f){
 	return f > 0.0f ? f : 0.0f;
 }
@@ -34,3 +32,5 @@ static float* Softmax(float input[], int length){
 		input[i] = input[i]/sum;
 	return input;
 }
+
+#endif //ALEXNET_UTLIS_H

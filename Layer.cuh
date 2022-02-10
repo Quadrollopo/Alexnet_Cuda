@@ -8,7 +8,7 @@ enum Act {reLu, Sigmoid, softmax};
 
 class Layer {
 public:
-	Layer(int n_neurons, int linked_neurons, Act func);
+	Layer(Act func);
 	~Layer();
 	virtual float* forward(float *values);
 	virtual float* backpropagation(float* cost, float* back_neurons) = 0;
@@ -16,10 +16,9 @@ public:
 	int getNeurons();
 	float* getActivations();
 	int getNumBackNeurons() const;
-private:
+protected:
 	int num_neurons;
 	int num_back_neurons;
-protected:
 	int num_weights;
 	float *activations;
 	float *weights;

@@ -1,9 +1,15 @@
 #include "FullLayer.cuh"
 
-FullLayer::FullLayer(int n_neurons, int linked_neurons, Act func) : Layer(n_neurons, linked_neurons, func){
+FullLayer::FullLayer(int n_neurons, int linked_neurons, Act func) : Layer(func){
     /**
      * weights: number of rows = weights_len, number of columns = num_neurons
      **/
+	this->num_neurons = n_neurons;
+	this->num_back_neurons = linked_neurons;
+	this->num_weights = n_neurons*linked_neurons;
+	this->weights = new float[num_weights];
+	this->weights_derivative = new float[num_weights]();
+	this->activations = new float[n_neurons];
 	std::random_device generator;
 	std::uniform_real_distribution<float> weights_rand = std::uniform_real_distribution<float>(0.0f, 1.0f);
 	for (int i=0; i<n_neurons*linked_neurons; i++){
