@@ -13,12 +13,10 @@ public:
 	virtual float* forward(float *values);
 	virtual float* backpropagation(float* cost, float* back_neurons) = 0;
 	virtual void applyGradient(float lr) = 0;
-	int getNeurons();
+	virtual int getNeurons() = 0;
+	virtual int getNumBackNeurons() = 0;
 	float* getActivations();
-	int getNumBackNeurons() const;
 protected:
-	int num_neurons;
-	int num_back_neurons;
 	int num_weights;
 	float *activations;
 	float *weights;

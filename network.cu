@@ -1,20 +1,57 @@
 #include "network.cuh"
 
-void Network::addFullLayer(int neurons, Act func){
-	int num_back_neurons;
-	if (layers.empty()) {
-        num_back_neurons = input_size;
-	}
-	else{
-		num_back_neurons = layers.back()->getNeurons();
-	}
 
-	layers.push_back(new FullLayer(neurons, num_back_neurons, func));
-}
 
 Network::Network(int n_input, float lr) {
 	input_size = n_input;
 	this->lr = lr;
+	channels = NULL;
+}
+
+
+Network::Network(int img_size, int channel, float lr) {
+	input_size = img_size;
+	this->lr = lr;
+	this->channels = channel;
+}
+
+void Network::addFullLayer(int neurons, Act func){
+	int back_neurons;
+	if (layers.empty()) {
+		back_neurons = input_size;
+	}
+	else{
+		back_neurons = layers.back()->getNeurons();
+	}
+
+	layers.push_back(new FullLayer(neurons, back_neurons, func));
+	lastLayerType = full;
+}
+
+void Network::addConvLayer(int kern_size, int num_kernels, int stride, bool pad, Act func) {
+	int input_conv;
+	int channels;
+	if (layers.empty()) {
+		if(this->channels == NULL){
+			std::cout << "Bad network channels initialization: no channels specified" << std::endl;
+			exit(-1);
+		}
+		input_conv = input_size;
+		channels = this->channels;
+	}
+	else{
+		if(lastLayerType == full){
+			std::cout << "Cant add a convolutional layer to a full layer" << std::endl;
+			exit(-1);
+		}
+		ConvLayer* conv = (ConvLayer*)layers.back();
+		input_conv = conv->getOutputSize();
+		channels = conv->getOutputChannel();
+	}
+
+	layers.push_back(
+			new ConvLayer(input_conv, channels, kern_size, num_kernels, stride, pad, func));
+	lastLayerType = conv;
 }
 
 float* Network::forward(float input[]) {
@@ -29,13 +66,8 @@ float* Network::forward(float input[]) {
 void Network::train(const float output[], const float expected[], float input[]) {
 	//Define loss
 	float* cost = new float[getOutputSize()];
-    //printf("Cost: \n");
-	for(int i=0; i<getOutputSize(); i++){
-        cost[i] = (output[i] - expected[i]) * 2; //rivedere
-        //printf("%f ",cost[i]);
-    }
-
-   // printf("\n");
+	for(int i=0; i<getOutputSize(); i++)
+		cost[i] = (output[i] - expected[i]) * 2;
 	for(int i=layers.size()-1; i>0; i--){
 		cost = layers[i]->backpropagation(cost, layers[i-1]->getActivations());
 	}
@@ -52,3 +84,4 @@ void Network::learn() {
 		f->applyGradient(lr);
 	}
 }
+

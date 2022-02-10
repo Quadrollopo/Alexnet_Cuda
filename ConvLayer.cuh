@@ -3,30 +3,33 @@
 using namespace std;
 
 #include "Layer.cuh"
+#include "CUDA/convolution.cuh"
+#include <memory>
+#include <random>
 
 class ConvLayer: public Layer{
 public:
-    ConvLayer(int input_size, int input_channel, int kernel_size, int kernel_channel, int stride, bool pad);
+    ConvLayer(int input_size, int channels, int kernel_size, int kernel_num, int stride, bool pad, Act func);
     ~ConvLayer();
     int getInputSize();
-    int getInputChannel();
     int getKernelSize();
-    int getKernelChannel();
-    int getOutputSize();
+	int getChannel();
+	int getOutputSize();
     int getOutputChannel();
     float *forward(float *image) override;
     float *backpropagation(float* cost, float* back_neurons) override;
     void applyGradient(float lr) override;
+	int getNeurons() override;
+	int getNumBackNeurons() override;
 private:
     int input_size;
-    int input_channel;
-    float *kernel;
+    int channels;
     int kernel_size;
-    int kernel_channel;
+    int kernel_num;
     int stride;
     int pad;
     int output_size;
-    int output_channel;
+	int output_len;
 };
 
 

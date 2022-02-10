@@ -10,24 +10,27 @@ FullLayer::FullLayer(int n_neurons, int linked_neurons, Act func) : Layer(func){
 	this->weights = new float[num_weights];
 	this->weights_derivative = new float[num_weights]();
 	this->activations = new float[n_neurons];
+	this->bias = new float[n_neurons]();
+	this->bias_derivative = new float[n_neurons]();
 	std::random_device generator;
 	std::uniform_real_distribution<float> weights_rand = std::uniform_real_distribution<float>(0.0f, 1.0f);
-	for (int i=0; i<n_neurons*linked_neurons; i++){
+	for (int i=0; i<num_weights; i++){
 		weights[i] = weights_rand(generator);
 //		weights[i] = 1.0f;
 	}
-    this->bias = new float[n_neurons]();
-    this->bias_derivative = new float[n_neurons]();
 }
 
 FullLayer::~FullLayer(){
 	Layer::~Layer();
 	delete[] this->bias;
     delete[] this->bias_derivative;
+	delete[] this->weights;
+	delete[] this->activations;
+	delete[] this->weights_derivative;
 }
 
 float* FullLayer::forward(float *values) {
-	float *val =matrix_mul(values,
+	float *val =matrix_mul_CPU(values,
                            this->weights,
                            1,
                            this->getNumBackNeurons(),
@@ -87,4 +90,12 @@ void FullLayer::applyGradient(float lr) {
 		bias[i] -= bias_derivative[i] * lr;
 		bias_derivative[i] = 0;
 	}
+}
+
+int FullLayer::getNeurons() {
+	return num_neurons;
+}
+
+int FullLayer::getNumBackNeurons() {
+	return num_back_neurons;
 }

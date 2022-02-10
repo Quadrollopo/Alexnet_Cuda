@@ -1,58 +1,72 @@
 #include "ConvLayer.cuh"
-#include "utils.cuh"
-#include "CUDA/convolution.cuh"
-#include "CUDA/vectorSum.cuh"
-#include <random>
-#include <stdexcept>
 
-ConvLayer::ConvLayer(int input_size, int input_channel, int kernel_size, int kernel_channel, int stride, int pad)
-		: Layer(n_neurons, linked_neurons, func){
+
+ConvLayer::ConvLayer(int input_size, int channels, int kernel_size, int kernel_num,
+					 int stride, bool pad, Act func)
+		: Layer(func){
     this->input_size = input_size;
-    this->input_channel = input_channel;
+    this->channels = channels;
     this->kernel_size = kernel_size;
-    this->kernel_channel = kernel_channel;
+    this->kernel_num = kernel_num;
     this->stride = stride;
-    this->pad = pad;
-    this->output_size = (input_size-kernel_size+2*pad)/stride+1;
-    this->output_channel = kernel_channel;
-    this->kernel = new float[kernel_size*kernel_size*input_channel*kernel_channel]();
+	if(pad)
+    	this->pad = (kernel_size - 1) / 2;
+	else
+		this->pad = 0;
+    this->output_size = ((input_size-kernel_size+2*pad)/stride+1);
+    this->output_len = output_size*output_size*kernel_num;
+	this->num_weights = kernel_size*kernel_size*channels*kernel_num;
+	this->weights = new float [num_weights];
+	std::random_device generator;
+	std::uniform_real_distribution<float> weights_rand = std::uniform_real_distribution<float>(0.0f, 1.0f);
+	for (int i=0; i<num_weights; i++) {
+		weights[i] = weights_rand(generator);
+	}
+	this->weights_derivative = new float [num_weights];
+	this->bias = new float [output_len]();
+	this->bias_derivative = new float [output_len];
+	this->activations = new float [output_len];
 }
 
 ConvLayer::~ConvLayer(){
-    delete[] this->kernel;
+	Layer::~Layer();
+    delete[] this->weights;
+    delete[] this->weights_derivative;
+	delete[] this->bias;
+	delete[] this->bias_derivative;
 }
 
 float* ConvLayer::forward(float *image) {
     auto res = convolution(image,
-                           this->kernel,
+                           this->weights,
                            this->input_size,
                            this->kernel_size,
                            this->stride,
                            this->pad,
-                           this->input_channel,
-                           this->kernel_channel);
-    for(int i = 0; i < output_size * output_size * output_channel; i++)
-        res[i] = reLU(res[i]);
+                           this->channels,
+                           this->kernel_num);
+    for(int i = 0; i < output_len; i++) {
+		res[i] += bias[i];
+		res[i] = activation_func(res[i]);
+		activations[i] = res[i];
+	}
     return res;
 }
 
 int ConvLayer::getInputSize() {
     return this->input_size;
 }
-int ConvLayer::getInputChannel() {
-    return this->input_channel;
+int ConvLayer::getChannel() {
+    return this->channels;
 }
 int ConvLayer::getKernelSize() {
     return this->kernel_size;
-}
-int ConvLayer::getKernelChannel() {
-    return this->kernel_channel;
 }
 int ConvLayer::getOutputSize() {
     return this->output_size;
 }
 int ConvLayer::getOutputChannel() {
-    return this->output_channel;
+    return this->kernel_num;
 }
 
 void ConvLayer::applyGradient(float lr) {
@@ -61,4 +75,12 @@ void ConvLayer::applyGradient(float lr) {
 
 float *ConvLayer::backpropagation(float *cost, float *back_neurons) {
 	return nullptr;
+}
+
+int ConvLayer::getNeurons() {
+	return output_len;
+}
+
+int ConvLayer::getNumBackNeurons() {
+	return input_size*input_size*channels;
 }

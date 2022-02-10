@@ -2,9 +2,7 @@
 
 
 Layer::Layer(Act func) {
-	/**
-	 * weights: number of rows = weights_len, number of columns = num_neurons
-	 **/
+
 	switch (func) {
 		case reLu:
 			activation_func = reLU;
@@ -20,22 +18,10 @@ Layer::Layer(Act func) {
 	}
 }
 
-Layer::~Layer(){
-	delete[] this->weights;
-	delete[] this->activations;
-	delete[] this->weights_derivative;
-}
-
-int Layer::getNeurons() {
-	return this->num_neurons;
-}
+Layer::~Layer()= default;
 
 float* Layer::getActivations() {
 	return this->activations;
-}
-
-int Layer::getNumBackNeurons() const {
-	return num_back_neurons;
 }
 
 float *Layer::forward(float *values) {

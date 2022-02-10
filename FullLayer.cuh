@@ -18,7 +18,11 @@ public:
 	float* forward(float *values) override;
 	float* backpropagation(float* cost, float* back_neurons) override;
 	void applyGradient(float lr) override;
+	int getNeurons() override;
+	int getNumBackNeurons() override;
 private:
+	int num_neurons;
+	int num_back_neurons;
 };
 
 
