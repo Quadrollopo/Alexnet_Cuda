@@ -222,7 +222,7 @@ float* FullLayer::backpropagation(float* cost, float* back_neurons) {
 
 	delete[] current_bias_derivative;
 
-	for (int i=0; i<getNeurons(); i++){
+	for (int i=0; i<num_weights; i++){
 		weights_derivative[i] += current_weights_derivative[i];
 	}
 //    vector_sum(weights_derivative, current_weights_derivative, num_weights);

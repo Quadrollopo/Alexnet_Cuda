@@ -5,7 +5,8 @@ using namespace std;
 #include "Layer.cuh"
 #include <memory>
 #include <random>
-
+#include <cuda_runtime.h>
+#include "CUDA_or_CPU.cuh"
 class ConvLayer: public Layer{
 public:
     ConvLayer(int input_size, int channels, int kernel_size, int kernel_num, int stride, bool pad, Act func);

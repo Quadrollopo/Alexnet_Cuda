@@ -1,6 +1,4 @@
 #include "Layer.cuh"
-
-
 Layer::Layer(Act func) {
 #if CUDA
     switch (func) {
@@ -45,3 +43,5 @@ float* Layer::getActivations() {
 float *Layer::forward(float *values) {
 	return nullptr;
 }
+
+

@@ -75,6 +75,10 @@ void Network::train(const float output[], const float expected[], float input[])
     vector_constant_mul(cost,2,getOutputSize());
 	for(int i=layers.size()-1; i>0; i--){
 		cost = layers[i]->backpropagation(cost, layers[i-1]->getActivations());
+        /*printf("Cost: \n");
+        for(int j=0; j<layers[i]->getNumBackNeurons();j++)
+            printf("%f ",cost[j]);
+        printf("\n");*/
 	}
 	cost = layers[0]->backpropagation(cost, input);
 

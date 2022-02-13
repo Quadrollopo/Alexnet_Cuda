@@ -45,27 +45,18 @@ float* max_pooling(float *image, int image_size, int pool_size, int stride, int 
 //        std::cout << "Filter size is not odd" << std::endl;
 //        return nullptr;
 //    }
-    float *d_image, *d_res;
+    float *d_res;
     int res_dim = (image_size-pool_size)/stride+1;
-    float* res = new float[res_dim * res_dim * channel]();
 
 
-    cudaMalloc(&d_image, image_size * image_size * channel * sizeof(float));
     cudaMalloc(&d_res, res_dim * res_dim * channel * sizeof(float));
+    cudaMemset(&d_res,0,res_dim * res_dim * channel * sizeof(float));
 
-    cudaMemcpy(d_image, image, image_size * image_size * channel * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_res, res, res_dim * res_dim * channel * sizeof(float), cudaMemcpyHostToDevice);
+    max_pooling_CUDA<<<dim3(res_dim, res_dim),channel>>>(image,d_res,image_size,pool_size,stride,channel,res_dim);
 
-    max_pooling_CUDA<<<dim3(res_dim, res_dim),channel>>>(d_image,d_res,image_size,pool_size,stride,channel,res_dim);
+    //cudaDeviceReset();
 
-    cudaMemcpy(res, d_res, res_dim * res_dim * channel * sizeof(float), cudaMemcpyDeviceToHost);
-
-    cudaFree(d_image);
-    cudaFree(d_res);
-
-    cudaDeviceReset();
-
-    return res;
+    return d_res;
 }
 
 
