@@ -3,7 +3,6 @@
 using namespace std;
 
 #include "Layer.cuh"
-#include "CUDA/convolution.cuh"
 #include <memory>
 #include <random>
 

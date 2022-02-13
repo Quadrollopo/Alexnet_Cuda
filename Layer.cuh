@@ -3,8 +3,9 @@
 #define ALEXNET_LAYER_H
 
 #include "utils.cuh"
+#include "CUDA_or_CPU.cuh"
 
-enum Act {reLu, Sigmoid, softmax};
+enum Act {reLu, Sigmoid, softmax, last};
 
 class Layer {
 public:
@@ -23,8 +24,14 @@ protected:
 	float *weights_derivative;
 	float *bias;
 	float *bias_derivative;
+#if CUDA
+	void (*activation_func)(float*, int);
+	float* (*derivative_func)(float*, int);
+#else
 	float (*activation_func)(float);
 	float (*derivative_func)(float);
+#endif
+
 };
 
 #endif

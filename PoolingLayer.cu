@@ -41,3 +41,4 @@ int PoolingLayer::getOutputSize() {
 int PoolingLayer::getOutputChannel() {
     return this->output_channel;
 }
+
