@@ -25,6 +25,10 @@ private:
     float *neurons;
 	int num_neurons;
 	int num_back_neurons;
+    float *activation_derivative;
+    float *current_bias_derivative;
+    float *current_weights_derivative;
+    float *prev_layer_derivative;
 };
 
 

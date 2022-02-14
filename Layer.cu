@@ -13,9 +13,6 @@ Layer::Layer(Act func) {
         case softmax:
             activation_func = Softmax_CUDA;
             derivative_func = der_sigmoid_CUDA;
-        case last:
-            activation_func = nope;
-            derivative_func = nope_der;
     }
 #else
     switch (func) {

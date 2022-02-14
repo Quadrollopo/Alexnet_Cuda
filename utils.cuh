@@ -31,6 +31,4 @@ static float* Softmax(float input[], int length){
         input[i] = input[i]/sum;
     return input;
 }
-void nope(float *f, int len);
-float* nope_der(float *f, int len);
 #endif

@@ -26,7 +26,7 @@ protected:
 	float *bias_derivative;
 #if CUDA
 	void (*activation_func)(float*, int);
-	float* (*derivative_func)(float*, int);
+	void (*derivative_func)(float*, float*, int);
 #else
 	float (*activation_func)(float);
 	float (*derivative_func)(float);

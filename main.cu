@@ -9,7 +9,7 @@
 using namespace std;
 
 #define BATCH_SIZE 64
-#define NUM_EPOCHS 100
+#define NUM_EPOCHS 10
 #define NUM_TEST 4
 
 vector<vector<float>> read_mnist();
@@ -53,6 +53,76 @@ int main() {
 		}
 	}
 	cout <<"Test: " << (float) hit/ NUM_TEST << endl;
+
+    int image_size = 2048;
+    int kernel_size = 3;
+    int pad = 1;
+    int stride = 2;
+    int image_ch = 3;
+    int kernel_ch = 10;
+
+
+
+//    auto image = new float[image_size*image_size*image_ch];
+//    auto kernel = new float[kernel_size*kernel_size*kernel_ch*image_ch];
+//    for(int i=0;i<image_size*image_size*image_ch;i++)
+//        image[i]=(float)i+1;
+//    for(int i=0; i<kernel_ch; i++) {
+//        for (int j = 0; j < image_ch; j++){
+//             for (int k = 0; k < kernel_size * kernel_size; k++) {
+//                kernel[i * kernel_size * kernel_size * image_ch + j * kernel_size * kernel_size + k] =
+//                        (float)i * kernel_size * kernel_size * image_ch + j * kernel_size * kernel_size + k + 1;
+//                //printf("%.1f ",kernel[i * kernel_size * kernel_size * image_ch + j * image_ch + k]);
+//            }
+//             //printf("\n");
+//        }
+//    }
+//    float *d_image, *d_kernel;
+//    cudaMalloc(&d_image, image_size * image_size * image_ch * sizeof(float));
+//    cudaMalloc(&d_kernel, kernel_size * kernel_size * image_ch * kernel_ch * sizeof(float));
+//
+//    cudaMemcpy(d_image, image, image_size * image_size * image_ch * sizeof(float), cudaMemcpyHostToDevice);
+//    cudaMemcpy(d_kernel, kernel, kernel_size * kernel_size * image_ch * kernel_ch * sizeof(float), cudaMemcpyHostToDevice);
+//
+//    //float* conv_CUDA = convolution(image,kernel,image_size,kernel_size,stride,pad,image_ch,kernel_ch);
+//    float* res_CUDA = convolution(d_image,d_kernel,image_size,kernel_size,stride,pad,image_ch,kernel_ch);
+//    //auto res_CPU = convolution_CPU(image,kernel,kernel_size,image_size,stride,true);
+//    //delete[] conv_CUDA;
+//    delete[] res_CUDA;
+//    delete[] image;
+//    delete[] kernel;
+//    //delete[] res_CPU;
+//
+//    cudaFree(d_image);
+//    cudaFree(d_kernel);
+
+    auto image1 = new float[image_size*image_size];
+    auto image2 = new float[image_size*image_size];
+    for(int i=0;i<image_size*image_size;i++){
+        image1[i]=(float)i+1;
+    }
+    for(int i=0;i<image_size*image_size;i++){
+        image2[i]=(float)i+1;
+    }
+    float *d_image1, *d_image2, *d_image3;
+    cudaMalloc(&d_image1, image_size * image_size * sizeof(float));
+    cudaMalloc(&d_image2, image_size * image_size * sizeof(float));
+    cudaMalloc(&d_image3, image_size * image_size * sizeof(float));
+
+    cudaMemcpy(d_image1, image1, image_size * image_size * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_image2, image2,  image_size * image_size * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemset(d_image3, 0,  image_size * image_size * sizeof(float));
+
+    //float* res_CUDA = matrix_mul3(d_image1,d_image2,image_size,image_size,image_size);
+    matrix_mul3(d_image1,d_image2, d_image3, image_size,image_size,image_size);
+
+//    delete[] image1;
+//    delete[] image2;
+//    //cudaFree(res_CUDA);
+//    cudaFree(res_CUDA2);
+//    cudaFree(d_image1);
+//    cudaFree(d_image2);
+
     return 0;
 }
 

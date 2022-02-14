@@ -30,6 +30,10 @@ FullLayer::FullLayer(int n_neurons, int linked_neurons, Act func) : Layer(func){
     cudaMalloc(&this->bias_derivative,n_neurons * sizeof(float));
     cudaMemset(this->bias_derivative,0,n_neurons * sizeof(float));
     cudaMalloc(&this->neurons,n_neurons * sizeof(float));
+    cudaMalloc(&this->current_weights_derivative,num_weights * sizeof(float));
+    cudaMalloc(&this->prev_layer_derivative,num_back_neurons * sizeof(float));
+    cudaMalloc(&this->activation_derivative,num_neurons * sizeof(float));
+    cudaMalloc(&this->current_bias_derivative,num_neurons * sizeof(float));
 
     delete[] tmp_weights_der;
     delete[] tmp_bias_der;
@@ -44,21 +48,22 @@ FullLayer::~FullLayer(){
     cudaFree(this->activations);
     cudaFree(this->neurons);
     cudaFree(this->weights_derivative);
+    cudaFree(this->current_weights_derivative);
+    cudaFree(this->prev_layer_derivative);
+    cudaFree(this->activation_derivative);
+    cudaFree(this->current_bias_derivative);
 }
 
 float* FullLayer::forward(float *values) {
-    float *activationss = matrix_mul(values,
-                           this->weights,
-                           1,
-                           this->getNumBackNeurons(),
-                           this->getNeurons());
-
-    vector_sum(activationss,bias,getNeurons());
-    //cudaMemcpy(this->neurons, activationss, this->getNeurons()*sizeof(float), cudaMemcpyDeviceToDevice);
-    activation_func(activationss, getNeurons());
-    cudaMemcpy(this->activations, activationss, this->getNeurons()*sizeof(float), cudaMemcpyDeviceToDevice);
-
-    return activationss;
+    matrix_mul3(values,
+               this->weights,
+               activations,
+               1,
+               this->getNumBackNeurons(),
+               this->getNeurons());
+    vector_sum(activations,bias,getNeurons());
+    activation_func(activations, getNeurons());
+    return activations;
 }
 
 float* FullLayer::backpropagation(float* cost, float* back_neurons) {
@@ -66,33 +71,24 @@ float* FullLayer::backpropagation(float* cost, float* back_neurons) {
     // so we start computing bias derivatives and then use those as baseline for other derivatives
 
 
-    float *der_fun = derivative_func(activations, getNeurons());
-    float *current_bias_derivative = vector_mul(der_fun,cost,num_neurons);
-    //cudaFree(der_fun);
+    derivative_func(activations, activation_derivative, getNeurons());
+    vector_mul(activation_derivative,cost,current_bias_derivative,num_neurons);
     vector_sum(bias_derivative,current_bias_derivative,getNeurons());
-    //cudaFree(cost);
-    float* current_weights_derivative = matrix_mul(back_neurons,
-                                                   current_bias_derivative,
-                                                   this->getNumBackNeurons(),
-                                                   1,
-                                                   this->getNeurons());
-    float* prev_layer_derivative = matrix_mul(this->weights,
-                                              current_bias_derivative,
-                                              this->getNumBackNeurons(),
-                                              this->getNeurons(),
-                                              1);
-
-    //cudaFree(current_bias_derivative);
+    matrix_mul3(back_neurons,
+               current_bias_derivative,
+               current_weights_derivative,
+               this->getNumBackNeurons(),
+               1,
+               this->getNeurons());
+    matrix_mul3(this->weights,
+               current_bias_derivative,
+               prev_layer_derivative,
+               this->getNumBackNeurons(),
+               this->getNeurons(),
+               1);
 
     vector_sum(weights_derivative,current_weights_derivative,num_weights);
-
-
-    //cudaFree(current_weights_derivative);
-    float *x;
-    cudaMalloc(&x, getNumBackNeurons() * sizeof(float));
-    cudaMemcpy(x, prev_layer_derivative, getNumBackNeurons() * sizeof(float), cudaMemcpyDeviceToDevice);
-
-    return x;
+    return prev_layer_derivative;
 }
 
 void FullLayer::applyGradient(float lr) {
@@ -182,7 +178,7 @@ FullLayer::~FullLayer(){
 }
 
 float* FullLayer::forward(float *values) {
-	float *val =matrix_mul(values,
+	float *val =matrix_mul_CPU(values,
                            this->weights,
                            1,
                            this->getNumBackNeurons(),

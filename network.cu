@@ -57,7 +57,7 @@ float* Network::forward(float input[]) {
 	for (Layer *f : layers){
         float *new_input = f->forward(input);
 #if CUDA
-        //cudaFree(input);
+// cudaFree(input);
 #else
         //delete[] input;
 #endif
@@ -71,16 +71,19 @@ float* Network::forward(float input[]) {
 void Network::train(const float output[], const float expected[], float input[]) {
 #if CUDA
 	//Define loss
-    float* cost = vector_diff_alloc(output, expected, getOutputSize());
+    float *cost;
+    cudaMalloc(&cost, getOutputSize() * sizeof(float));
+    vector_diff_alloc(output, expected, cost, getOutputSize());
     vector_constant_mul(cost,2,getOutputSize());
+    float *tmp = cost;
 	for(int i=layers.size()-1; i>0; i--){
-		cost = layers[i]->backpropagation(cost, layers[i-1]->getActivations());
+		tmp = layers[i]->backpropagation(tmp, layers[i-1]->getActivations());
         /*printf("Cost: \n");
         for(int j=0; j<layers[i]->getNumBackNeurons();j++)
             printf("%f ",cost[j]);
         printf("\n");*/
 	}
-	cost = layers[0]->backpropagation(cost, input);
+	layers[0]->backpropagation(cost, input);
 
     //cudaFree(cost);
 #else

@@ -1,4 +1,5 @@
 #include "PoolingLayer.cuh"
+
 #include "utils.cuh"
 #include "CUDA/maxPooling.cuh"
 #include "CUDA/vectorSum.cuh"
@@ -26,8 +27,17 @@ float* PoolingLayer::forward(float *image) {
     return res;
 }
 
-int PoolingLayer::getInputSize() {
-    return this->input_size;
+float* PoolingLayer::backpropagation(float* cost, float* back_neurons){
+    return nullptr;
+}
+void PoolingLayer::applyGradient(float lr){
+
+}
+int PoolingLayer::getNeurons(){
+    return 0;
+}
+int PoolingLayer::getNumBackNeurons(){
+    return input_size;
 }
 int PoolingLayer::getInputChannel() {
     return this->input_channel;

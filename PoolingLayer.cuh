@@ -4,7 +4,7 @@ using namespace std;
 
 class PoolingLayer{
 public:
-    PoolingLayer(int input_size, int input_channel, int kernel_size, int stride);
+    PoolingLayer(int input_size, int input_channel, int kernel_size, int stride, Act func);
     ~PoolingLayer();
     int getInputSize();
     int getInputChannel();
