@@ -13,6 +13,9 @@ Layer::Layer(Act func) {
         case softmax:
             activation_func = Softmax_CUDA;
             derivative_func = der_sigmoid_CUDA;
+			break;
+		case pool: //pool layer dont need a activation function
+			break;
     }
 #else
     switch (func) {
@@ -40,5 +43,5 @@ float* Layer::getActivations() {
 float *Layer::forward(float *values) {
 	return nullptr;
 }
-
+#include <iostream>
 

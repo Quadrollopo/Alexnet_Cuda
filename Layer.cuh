@@ -5,7 +5,7 @@
 #include "utils.cuh"
 #include "CUDA_or_CPU.cuh"
 
-enum Act {reLu, Sigmoid, softmax, last};
+enum Act {reLu, Sigmoid, softmax, pool};
 
 class Layer {
 public:

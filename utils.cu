@@ -1,5 +1,4 @@
 #include "utils.cuh"
-#include "stdio.h"
 #include <cuda_runtime.h>
 
 __global__ void reLU(float *f, int len){

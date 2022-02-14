@@ -4,14 +4,14 @@
 Network::Network(int n_input, float lr) {
 	input_size = n_input;
 	this->lr = lr;
-	channels = NULL;
+	channels_init = NULL;
 }
 
 
 Network::Network(int img_size, int channel, float lr) {
 	input_size = img_size;
 	this->lr = lr;
-	this->channels = channel;
+	this->channels_init = channel;
 }
 
 void Network::addFullLayer(int neurons, Act func){
@@ -31,12 +31,12 @@ void Network::addConvLayer(int kern_size, int num_kernels, int stride, bool pad,
 	int input_conv;
 	int channels;
 	if (layers.empty()) {
-		if(this->channels == NULL){
-			std::cout << "Bad network channels initialization: no channels specified" << std::endl;
+		if(this->channels_init == NULL){
+			cout << "Bad network channels initialization: no channels specified" << std::endl;
 			exit(-1);
 		}
 		input_conv = input_size;
-		channels = this->channels;
+		channels = this->channels_init;
 	}
 	else{
 		if(lastLayerType == full){
@@ -51,6 +51,20 @@ void Network::addConvLayer(int kern_size, int num_kernels, int stride, bool pad,
 	layers.push_back(
 			new ConvLayer(input_conv, channels, kern_size, num_kernels, stride, pad, func));
 	lastLayerType = conv;
+}
+
+void Network::addPoolLayer(int pool_size, int stride){
+	if(lastLayerType != conv){
+		cout << "cant add a pool layer to a non conv layer" << endl;
+		exit(-1);
+	}
+
+	auto* conv = (ConvLayer*)layers.back();
+	int input_conv = conv->getOutputSize();
+	int channels = conv->getOutputChannel();
+	layers.push_back(
+			new PoolingLayer(input_conv, channels, pool_size, stride, pool));
+
 }
 
 float* Network::forward(float input[]) {

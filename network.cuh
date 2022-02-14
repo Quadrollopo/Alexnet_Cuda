@@ -7,13 +7,14 @@
 #include <iostream>
 #include "FullLayer.cuh"
 #include "ConvLayer.cuh"
+#include "PoolingLayer.cuh"
 #include "CUDA_or_CPU.cuh"
 using namespace std;
 
 class Network {
 	vector<Layer*> layers;
 	int input_size;
-	int channels;
+	int channels_init;
 	float lr;
 	enum layer_type{full, conv};
 	layer_type lastLayerType;
@@ -23,6 +24,7 @@ public:
 	Network(int img_size, int channel, float lr);
 	void addFullLayer(int neurons, Act func);
 	void addConvLayer(int kern_size, int num_kernels, int stride, bool pad, Act func);
+	void addPoolLayer(int pool_size, int stride);
 	float* forward(float input[]);
 	void train(const float output[], const float expected[], float input[]);
 	void learn(float batch_size);

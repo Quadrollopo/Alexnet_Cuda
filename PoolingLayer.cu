@@ -29,13 +29,14 @@ float* PoolingLayer::forward(float *image) {
 }
 
 float* PoolingLayer::backpropagation(float* cost, float* back_neurons){
-    return nullptr;
+	float *back_cost = new float[input_size*input_size*input_channel]();
+	//TODO: ritornare gli indici dei max
+    return back_cost;
 }
 void PoolingLayer::applyGradient(float lr){
-
 }
 int PoolingLayer::getNeurons(){
-    return 0;
+    return output_size*output_size*output_channel;
 }
 int PoolingLayer::getNumBackNeurons(){
     return input_size;
