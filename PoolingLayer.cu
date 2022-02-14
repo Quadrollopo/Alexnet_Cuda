@@ -6,7 +6,7 @@
 #include <random>
 #include <stdexcept>
 
-PoolingLayer::PoolingLayer(int input_size, int input_channel, int pool_size, int stride) {
+PoolingLayer::PoolingLayer(int input_size, int input_channel, int pool_size, int stride, Act func) : Layer(func) {
     this->input_size = input_size;
     this->input_channel = input_channel;
     this->pool_size = pool_size;
@@ -16,6 +16,7 @@ PoolingLayer::PoolingLayer(int input_size, int input_channel, int pool_size, int
 }
 
 PoolingLayer::~PoolingLayer(){
+    Layer::~Layer();
 }
 
 float* PoolingLayer::forward(float *image) {

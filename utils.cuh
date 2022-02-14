@@ -4,9 +4,9 @@
 
 //CUDA
 void reLU_CUDA(float *f, int len);
-float* Heaviside_CUDA(float *f, int len);
+void Heaviside_CUDA(float *f, float *res, int len);
 void sigmoid_CUDA(float *f, int len);
-float* der_sigmoid_CUDA(float *f, int len);
+void der_sigmoid_CUDA(float *f, float *res, int len);
 void Softmax_CUDA(float *input, int len);
 
 static float reLU(float f){

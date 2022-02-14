@@ -37,7 +37,7 @@ void sigmoid_CUDA(float *f, int len){
 }
 
 __global__ void der_sigmoid(float *f, float *res, int len){
-    unsigned int bx = threadIdx.x;
+    unsigned int bx = blockIdx.x*blockDim.x+threadIdx.x;
     if(bx < len){
         res[bx] = f[bx] * (1 - f[bx]);
     }
@@ -48,7 +48,7 @@ void  der_sigmoid_CUDA(float *f, float *res, int len){
 }
 
 __global__ void softmax(float *f, float sum, int len){
-    unsigned int bx = threadIdx.x;
+    unsigned int bx = blockIdx.x*blockDim.x+threadIdx.x;
     if(bx < len){
         float x = exp(f[bx]);
         atomicAdd(&sum,x);

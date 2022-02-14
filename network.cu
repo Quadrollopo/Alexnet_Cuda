@@ -85,7 +85,7 @@ void Network::train(const float output[], const float expected[], float input[])
 	}
 	layers[0]->backpropagation(cost, input);
 
-    //cudaFree(cost);
+    cudaFree(cost);
 #else
     //Define loss
 	float* cost = new float[getOutputSize()];
