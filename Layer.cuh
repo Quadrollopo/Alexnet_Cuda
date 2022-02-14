@@ -19,7 +19,7 @@ public:
 protected:
 	int num_weights;
 	float *activations;
-	float *weights;
+	float *weights; //number of rows = weights_len, number of columns = num_neurons
 	float *weights_derivative;
 	float *bias;
 	float *bias_derivative;

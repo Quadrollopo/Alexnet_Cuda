@@ -124,10 +124,7 @@ float* matrix_mul2(float *a, float *b, int a_row, int b_row, int b_col) {
  */
 float* matrix_mul_CPU(float *a, float *b, int a_row, int b_row, int b_col) {
 
-	auto res = new float[a_row * b_col];
-
-	for(int i=0; i < a_row * b_col; i++)
-		res[i] = 0.0f;
+	auto res = new float[a_row * b_col]();
 
 	for(int i = 0; i < a_row; i++)
 		for(int j=0; j < b_col; j++)

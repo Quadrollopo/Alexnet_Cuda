@@ -104,35 +104,29 @@ float* convolution(float *image, float *kernel, int image_size, int kernel_size,
 
 
 
-float* convolution_CPU(float *image, float *kernel, int kern_size, int img_size, int stride, bool pad) {
-	int depth = 2;
-	int pad_size;
-	if(pad) {
-		pad_size = (kern_size - 1);
-	}
-	else{
-		pad_size = 0;
-	}
-	int res_size = (img_size + pad_size - kern_size) / stride + 1;
-	pad_size /= 2;
-	float* res = new float [(res_size)*(res_size)];
+float* convolution_CPU(float *image, float *kernel, int img_size, int kern_size, int stride, int pad_size, int channel, int num_kernel) {
+	int res_size = (img_size + pad_size * 2 - kern_size) / stride + 1;
+	int kern_len = kern_size*kern_size*channel;
+	float* res = new float [res_size * res_size * num_kernel];
 
-	for (int x=0; x < res_size; x++){
-		for (int y=0; y < res_size; y++) {
-			int res_index = x * res_size + y;
-			res[res_index] = 0;
-			int x_image = x * stride - pad_size;
-			int y_image = y * stride - pad_size;
-			for (int i = 0; i < kern_size; i++) {
-				for (int j = 0; j < kern_size; j++) {
-					for (int z=0; z < depth; z++) {
-						if (x_image + i < 0
-							|| y_image + j < 0
-							|| x_image + i > img_size - 1
-							|| y_image + j > img_size - 1)
-							continue;
-						res[res_index] += kernel[i * kern_size + j + z*kern_size*kern_size] *
-								image[(i + x_image) * img_size + j + y_image + z*img_size*img_size];
+	for (int n=0, w=0, off_img=0; w <num_kernel; w++, n+=kern_len, off_img+=res_size*res_size) {
+		for (int x = 0; x < res_size; x++) {
+			for (int y = 0; y < res_size; y++) {
+				int res_index = off_img + (x * res_size + y);
+				res[res_index] = 0;
+				int x_image = x * stride - pad_size;
+				int y_image = y * stride - pad_size;
+				for (int i = 0; i < kern_size; i++) {
+					for (int j = 0; j < kern_size; j++) {
+						for (int z = 0; z < channel; z++) {
+							if (x_image + i < 0
+								|| y_image + j < 0
+								|| x_image + i > img_size - 1
+								|| y_image + j > img_size - 1)
+								continue;
+							res[res_index] += kernel[n + i * kern_size + j + z * kern_size * kern_size] *
+											  image[(i + x_image) * img_size + j + y_image + z * img_size * img_size];
+						}
 					}
 				}
 			}
@@ -140,4 +134,68 @@ float* convolution_CPU(float *image, float *kernel, int kern_size, int img_size,
 	}
 
     return res;
+}
+
+float* convolution_weights_CPU(float *image, float *kernel, int img_size, int kern_size, int stride, int pad_size, int channel, int num_kernel) {
+	int res_size = (img_size + pad_size * 2 - kern_size) / stride + 1;
+	int res_len = res_size * res_size;
+	float* res = new float [res_len * num_kernel * channel];
+
+	for (int n=0, w=0; w <num_kernel; w++, n+=res_len*channel) {
+		for (int z = 0; z < channel; z++) {
+			for (int x = 0; x < res_size; x++) {
+				for (int y = 0; y < res_size; y++) {
+					int res_index = n + z * res_len + x * res_size + y;
+					res[res_index] = 0;
+					int x_image = x * stride - pad_size;
+					int y_image = y * stride - pad_size;
+					for (int i = 0; i < kern_size; i++) {
+						for (int j = 0; j < kern_size; j++) {
+							if (x_image + i < 0
+								|| y_image + j < 0
+								|| x_image + i > img_size - 1
+								|| y_image + j > img_size - 1)
+								continue;
+							res[res_index] += kernel[w * kern_size*kern_size + i * kern_size + j] *
+											  image[(i + x_image) * img_size + j + y_image + z * img_size * img_size];
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return res;
+}
+
+float* convolution_cost_CPU(float *image, float *kernel, int img_size, int kern_size, int stride, int pad_size, int channel, int num_kernel) {
+	int res_size = (img_size + pad_size * 2 - kern_size) / stride + 1;
+	int kern_len = kern_size*kern_size*channel;
+	float* res = new float [res_size * res_size * channel];
+
+	for (int z = 0; z < channel; z++) {
+		for (int x = 0; x < res_size; x++) {
+			for (int y = 0; y < res_size; y++) {
+				int res_index = z + (x * res_size + y);
+				res[res_index] = 0;
+				int x_image = x * stride - pad_size;
+				int y_image = y * stride - pad_size;
+				for (int i = 0, rev_i = kern_size-1; i < kern_size; i++, rev_i--) {
+					for (int j = 0, rev_j = kern_size-1; j < kern_size; j++, rev_j--) {
+						for (int n=0, w=0; w <num_kernel; w++, n+=kern_len) {
+							if (x_image + i < 0
+								|| y_image + j < 0
+								|| x_image + i > img_size - 1
+								|| y_image + j > img_size - 1)
+								continue;
+							res[res_index] += kernel[n + rev_i * kern_size + rev_j + z * kern_size * kern_size] *
+											  image[(i + x_image) * img_size + j + y_image + z * img_size * img_size];
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return res;
 }

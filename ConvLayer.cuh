@@ -22,14 +22,14 @@ public:
 	int getNeurons() override;
 	int getNumBackNeurons() override;
 private:
-    int input_size;
-    int channels;
-    int kernel_size;
-    int kernel_num;
+    int input_size;	//lato dell'immagine
+    int channels;	//profondità
+    int kernel_size;	//lato del kernel
+    int kernel_num;	//numero di kernel
     int stride;
     int pad;
-    int output_size;
-	int output_len;
+    int output_size;	// lato dell'output
+	int output_len; //output_size*output_size*kernel_num
 };
 
 

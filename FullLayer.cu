@@ -48,19 +48,18 @@ float* FullLayer::forward(float *values) {
 float* FullLayer::backpropagation(float* cost, float* back_neurons) {
     // other derivatives are obtained in the same way as the bias derivative but using more terms
     // so we start computing bias derivatives and then use those as baseline for other derivatives
-	float* current_bias_derivative = new float[this->getNeurons()];
-    float* weights_derivative_CPU;
-    for(int i = 0; i < this->getNeurons(); i++){
+	float* current_bias_derivative = new float[num_neurons];
+    for(int i = 0; i < num_neurons; i++){
         current_bias_derivative[i] = derivative_func(this->activations[i]) * cost[i];
 		bias_derivative[i] += current_bias_derivative[i];
     }
 
 	delete[] cost;
-	float* current_weights_derivative = matrix_mul_CPU(current_bias_derivative,
-                                                       back_neurons,
-                                                       this->getNeurons(),
+	float* current_weights_derivative = matrix_mul_CPU(back_neurons,
+                                                       current_bias_derivative,
+                                                       this->num_back_neurons,
                                                        1,
-                                                       this->getNumBackNeurons());
+                                                       this->num_neurons);
     float* prev_layer_derivative = matrix_mul_CPU(this->weights,
                                                   current_bias_derivative,
                                                   this->getNumBackNeurons(),
@@ -69,12 +68,11 @@ float* FullLayer::backpropagation(float* cost, float* back_neurons) {
 
 	delete[] current_bias_derivative;
 
-	for (int i=0; i<getNeurons(); i++){
+	for (int i=0; i<num_weights; i++){
 		weights_derivative[i] += current_weights_derivative[i];
 	}
 //    vector_sum(weights_derivative, current_weights_derivative, num_weights);
 //    weights_derivative_CPU = vector_sum_CPU(weights_derivative, current_weights_derivative, num_weights);
-//    cmp(weights_derivative,weights_derivative_CPU,num_weights);
 
 	delete[] current_weights_derivative;
 	return prev_layer_derivative;
