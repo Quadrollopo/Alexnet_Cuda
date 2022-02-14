@@ -8,7 +8,8 @@
 #include <memory>
 #include <random>
 #include <stdexcept>
-
+#include <cuda_runtime.h>
+#include "CUDA_or_CPU.cuh"
 using namespace std;
 
 class FullLayer : public Layer{
@@ -21,6 +22,7 @@ public:
 	int getNeurons() override;
 	int getNumBackNeurons() override;
 private:
+    float *neurons;
 	int num_neurons;
 	int num_back_neurons;
 };

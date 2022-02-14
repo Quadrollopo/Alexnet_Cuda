@@ -7,7 +7,7 @@
 #include <iostream>
 #include "FullLayer.cuh"
 #include "ConvLayer.cuh"
-
+#include "CUDA_or_CPU.cuh"
 using namespace std;
 
 class Network {
@@ -25,7 +25,7 @@ public:
 	void addConvLayer(int kern_size, int num_kernels, int stride, bool pad, Act func);
 	float* forward(float input[]);
 	void train(const float output[], const float expected[], float input[]);
-	void learn();
+	void learn(float batch_size);
 };
 
 
