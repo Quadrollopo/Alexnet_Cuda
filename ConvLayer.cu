@@ -37,15 +37,17 @@ ConvLayer::ConvLayer(int input_size, int channels, int kernel_size, int kernel_n
     cudaMemset(&this->bias,0,output_len * sizeof(float));
     cudaMalloc(&this->bias_derivative,output_len * sizeof(float));
     cudaMemset(&this->bias_derivative,0,output_len * sizeof(float));
+
 }
 
     ConvLayer::~ConvLayer(){
-    Layer::~Layer();
+        Layer::~Layer();
         cudaFree(this->bias);
         cudaFree(this->bias_derivative);
         cudaFree(this->weights);
         cudaFree(this->activations);
         cudaFree(this->weights_derivative);
+
 }
 
 float* ConvLayer::forward(float *image) {

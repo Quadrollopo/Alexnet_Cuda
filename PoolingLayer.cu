@@ -13,25 +13,38 @@ PoolingLayer::PoolingLayer(int input_size, int input_channel, int pool_size, int
     this->stride = stride;
     this->output_size = (input_size-pool_size)/stride+1;
     this->output_channel = input_channel;
+    this->output_len = output_size * output_size * input_channel;
+    cudaMalloc(&this->activations, output_len * sizeof(int));
+    cudaMalloc(&this->max_indexes, output_len * sizeof(int));
+    cudaMalloc(&this->unpooling, input_size * input_size * input_channel * sizeof(int));
 }
 
 PoolingLayer::~PoolingLayer(){
     Layer::~Layer();
+    cudaFree(this->activations);
+    cudaFree(this->max_indexes);
+    cudaFree(this->unpooling);
 }
 
 float* PoolingLayer::forward(float *image) {
-    auto res = max_pooling(image,
-                           this->input_size,
-                           this->pool_size,
-                           this->stride,
-                           this->input_channel);
-    return res;
+    max_pooling(image,
+               activations,
+               max_indexes,
+               this->input_size,
+               this->pool_size,
+               this->stride,
+               this->input_channel);
+    return activations;
 }
 
 float* PoolingLayer::backpropagation(float* cost, float* back_neurons){
-	float *back_cost = new float[input_size*input_size*input_channel]();
-	//TODO: ritornare gli indici dei max
-    return back_cost;
+    max_unpooling(activations,
+                  max_indexes,
+                  unpooling,
+                  output_size, //we are going backward
+                  input_size, //input and output dimensions are inverted
+                  input_channel);
+    return unpooling;
 }
 void PoolingLayer::applyGradient(float lr){
 }

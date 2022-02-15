@@ -5,7 +5,7 @@
 
 #if CUDA
 
-__global__ void max_pooling_CUDA(float *image, float *res, int image_size, int pool_size, int stride,  int channel, int res_dim) {
+__global__ void max_pooling_CUDA(float *image, float *res, int *res2, int image_size, int pool_size, int stride,  int channel, int res_dim) {
 
     // Block index
     unsigned int bx = blockIdx.x;
@@ -16,18 +16,22 @@ __global__ void max_pooling_CUDA(float *image, float *res, int image_size, int p
 
     if(tx  < channel) {
         float x;
-        float max = -3.40282347e+38;
+        float max = -3.40282347e+38; //lowest float
+        int index_max = 0;
 
         int index = bx * stride * image_size + by * stride + tx * image_size * image_size; // indice iniziale
 
         for(int i = 0; i < pool_size; i++){
             for(int j = 0; j < pool_size; j++){
                 x = image[index + i * image_size + j];
-                if(x>max)
+                if(x>max) {
                     max=x;
+                    index_max = index + i * image_size + j;
+                }
             }
         }
         res[bx * res_dim + by + tx * res_dim * res_dim] = max;
+        res2[bx * res_dim + by + tx * res_dim * res_dim] = index_max;
     }
 }
 
@@ -40,25 +44,29 @@ __global__ void max_pooling_CUDA(float *image, float *res, int image_size, int p
  * @param pad
  **/
 
-float* max_pooling(float *image, int image_size, int pool_size, int stride, int channel) {
-//    if(pool_size % 2 == 0){
-//        std::cout << "Filter size is not odd" << std::endl;
-//        return nullptr;
-//    }
-    float *d_res;
+void max_pooling(float *image, float *res, int *res2, int image_size, int pool_size, int stride, int channel) {
+    if(pool_size % 2 == 0){
+        std::cout << "Pool size is not odd" << std::endl;
+        return;
+    }
     int res_dim = (image_size-pool_size)/stride+1;
-
-
-    cudaMalloc(&d_res, res_dim * res_dim * channel * sizeof(float));
-    cudaMemset(&d_res,0,res_dim * res_dim * channel * sizeof(float));
-
-    max_pooling_CUDA<<<dim3(res_dim, res_dim),channel>>>(image,d_res,image_size,pool_size,stride,channel,res_dim);
-
-    //cudaDeviceReset();
-
-    return d_res;
+    max_pooling_CUDA<<<dim3(res_dim, res_dim),channel>>>(image,res,res2,image_size,pool_size,stride,channel,res_dim);
 }
 
+__global__ void max_unpooling_CUDA(float *max, int *max_indexes, float *res, int input_size, int channel) {
+
+    unsigned int id = blockIdx.x * input_size + blockIdx.y + threadIdx.x * input_size * input_size;
+
+    if(id  < input_size * input_size * channel) {
+        res[max_indexes[id]] = max[id];
+    }
+}
+
+void max_unpooling(float *max, int *max_indexes, float *res, int input_size, int output_size, int channel) {
+    //we are going backward, so input comes from right and output is on left, with output_size > input_size
+    cudaMemset(res, 0 , output_size * output_size * channel);
+    max_unpooling_CUDA<<<dim3(input_size, input_size),channel>>>(max, max_indexes, res, input_size, channel);
+}
 
 float* max_pooling_CPU(float *image, int img_size, int pool_size, int stride, int channel) {
     int res_size = (img_size - pool_size) / stride + 1;

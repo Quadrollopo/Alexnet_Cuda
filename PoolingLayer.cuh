@@ -25,6 +25,9 @@ private:
     int stride;
     int output_size;
     int output_channel;
+    int output_len;
+    int *max_indexes;
+    float *unpooling;
 };
 
 
