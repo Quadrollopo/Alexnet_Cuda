@@ -5,6 +5,7 @@
 #include <chrono>
 #include <memory>
 #include <fstream>
+#include "CUDA/convolution.cuh"
 
 using namespace std;
 
@@ -16,50 +17,50 @@ vector<vector<float>> read_mnist();
 vector<uint8_t> read_label();
 
 int main() {
-	vector<vector<float>> numbers = read_mnist();
-	cout << "numbers loaded" << endl;
-	vector<uint8_t> labels = read_label();
-	cout << "label loaded" << endl;
-	Network net(28, 1,0.1f);
-	net.addConvLayer(7, 10, 1, false, reLu);
-    net.addFullLayer(10, Sigmoid);
-	float *out;
-	float* sol = new float [10]();
-	random_device r;
-	uniform_int_distribution<int> distribution = uniform_int_distribution<int>(0, 59999);
+//	vector<vector<float>> numbers = read_mnist();
+//	cout << "numbers loaded" << endl;
+//	vector<uint8_t> labels = read_label();
+//	cout << "label loaded" << endl;
+//	Network net(28, 1,0.1f);
+//	net.addConvLayer(7, 10, 1, false, reLu);
+//    net.addFullLayer(10, Sigmoid);
+//	float *out;
+//	float* sol = new float [10]();
+//	random_device r;
+//	uniform_int_distribution<int> distribution = uniform_int_distribution<int>(0, 59999);
+//
+//	for (int j=0; j < NUM_EPOCHS; j++) {
+//		double loss = 0.0;
+//		for (int i = 0; i < BATCH_SIZE; i++) {
+//			int x = distribution(r);
+//			sol[labels[x]] = 1;
+//			out = net.forward(numbers[x].data());
+//			net.train(out, sol, numbers[x].data());
+//			for(int z=0; z<10; z++)
+//				loss += pow((out[z] - sol[z]), 2);
+//			sol[labels[x]] = 0;
+//		}
+//		delete[] out;
+//		net.learn();
+//		cout <<"loss: " << loss / BATCH_SIZE << endl;
+//	}
+//	exit(0);
+//	int hit = 0;
+//	for (int i = 0; i < NUM_TEST; i++) {
+//		int x = i;
+////		out = net.forward(a);
+//		if(abs(out[0] - sol[x]) < 0.25f){
+//			hit++;
+//		}
+//	}
+//	cout <<"Test: " << (float) hit/ NUM_TEST << endl;
 
-	for (int j=0; j < NUM_EPOCHS; j++) {
-		double loss = 0.0;
-		for (int i = 0; i < BATCH_SIZE; i++) {
-			int x = distribution(r);
-			sol[labels[x]] = 1;
-			out = net.forward(numbers[x].data());
-			net.train(out, sol, numbers[x].data());
-			for(int z=0; z<10; z++)
-				loss += pow((out[z] - sol[z]), 2);
-			sol[labels[x]] = 0;
-		}
-		delete[] out;
-		net.learn();
-		cout <<"loss: " << loss / BATCH_SIZE << endl;
-	}
-	exit(0);
-	int hit = 0;
-	for (int i = 0; i < NUM_TEST; i++) {
-		int x = i;
-//		out = net.forward(a);
-		if(abs(out[0] - sol[x]) < 0.25f){
-			hit++;
-		}
-	}
-	cout <<"Test: " << (float) hit/ NUM_TEST << endl;
-
-    int image_size = 2048;
-    int kernel_size = 3;
-    int pad = 1;
-    int stride = 2;
-    int image_ch = 3;
-    int kernel_ch = 10;
+    int image_size = 7;
+    int kernel_size = 5;
+    int pad = 2;
+    int stride = 3;
+    int image_ch = 6;
+    int kernel_ch = 5;
 
 
 
@@ -101,30 +102,30 @@ int main() {
     cudaFree(d_image);
     cudaFree(d_kernel);
 
-    auto image1 = new float[image_size*image_size];
-    auto image2 = new float[image_size*image_size];
-    for(int i=0;i<image_size*image_size;i++){
-        image1[i]=(float)i+1;
-    }
-    for(int i=0;i<image_size*image_size;i++){
-        image2[i]=(float)i+1;
-    }
-    float *d_image1, *d_image2, *d_image3;
-    cudaMalloc(&d_image1, image_size * image_size * sizeof(float));
-    cudaMalloc(&d_image2, image_size * image_size * sizeof(float));
-    cudaMalloc(&d_image3, image_size * image_size * sizeof(float));
-
-    cudaMemcpy(d_image1, image1, image_size * image_size * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_image2, image2,  image_size * image_size * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemset(d_image3, 0,  image_size * image_size * sizeof(float));
-
-    //float* res_CUDA = matrix_mul3(d_image1,d_image2,image_size,image_size,image_size);
-    matrix_mul3(d_image1,d_image2, d_image3, image_size,image_size,image_size);
-
+//    auto image1 = new float[image_size*image_size];
+//    auto image2 = new float[image_size*image_size];
+//    for(int i=0;i<image_size*image_size;i++){
+//        image1[i]=(float)i+1;
+//    }
+//    for(int i=0;i<image_size*image_size;i++){
+//        image2[i]=(float)i+1;
+//    }
+//    float *d_image1, *d_image2, *d_image3;
+//    cudaMalloc(&d_image1, image_size * image_size * sizeof(float));
+//    cudaMalloc(&d_image2, image_size * image_size * sizeof(float));
+//    cudaMalloc(&d_image3, image_size * image_size * sizeof(float));
+//
+//    cudaMemcpy(d_image1, image1, image_size * image_size * sizeof(float), cudaMemcpyHostToDevice);
+//    cudaMemcpy(d_image2, image2,  image_size * image_size * sizeof(float), cudaMemcpyHostToDevice);
+//    cudaMemset(d_image3, 0,  image_size * image_size * sizeof(float));
+//
+//    //float* res_CUDA = matrix_mul3(d_image1,d_image2,image_size,image_size,image_size);
+//    matrix_mul3(d_image1,d_image2, d_image3, image_size,image_size,image_size);
+//
 //    delete[] image1;
 //    delete[] image2;
 //    //cudaFree(res_CUDA);
-//    cudaFree(res_CUDA2);
+//    //cudaFree(res_CUDA2);
 //    cudaFree(d_image1);
 //    cudaFree(d_image2);
 

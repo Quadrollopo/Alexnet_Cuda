@@ -68,17 +68,20 @@ void convolution(float *image, float *kernel, float *res, int image_size, int ke
 
     convolution_CUDA<<<dim3(res_dim, res_dim), dim3(kernel_size, kernel_size)>>>(image, kernel, res, image_size, kernel_size, stride, pad, res_dim, image_ch, kernel_ch);
 
-//    printf("convolution GPU:\n");
-//    for(int i=0; i < kernel_ch; i++){
-//        for(int j=0; j < res_dim * res_dim; j++)
-//            printf("%d ", (int)res[i*res_dim*res_dim + j]);
-//        printf("\n");
-//    }
-//    printf("\n\n\n");
-//    delete[] res;
+
+    float *ress = new float[res_dim*res_dim*kernel_ch];
+    cudaMemcpy(ress, res, res_dim*res_dim*kernel_ch * sizeof(float), cudaMemcpyDeviceToHost);
+    printf("convolution GPU:\n");
+    for(int i=0; i < kernel_ch; i++){
+        for(int j=0; j < res_dim * res_dim; j++)
+            printf("%d ", (int)ress[i*res_dim*res_dim + j]);
+        printf("\n");
+    }
+    printf("\n\n\n");
+    delete[] ress;
 }
-/*
-__global__ void convolution_backpropagation_CUDA(float *image, float *kernel, float *res, int image_size, int kernel_size, int stride, int pad, int res_dim,int image_ch, int kernel_ch) {
+
+__global__ void convolution_prevlayer_backpropagation_CUDA(float *cost, float *kernel, float *res, int cost_size, int kernel_size, int edge, int res_dim, int prevlayer_ch, int kernel_ch) {
 
     // Block index
     int bx = blockIdx.x;
@@ -144,10 +147,7 @@ void convolution_prevlayer_backpropagation(float *cost, float *kernel, float *re
     printf("\n\n\n");
     delete[] ress;
 
-
-    //return res;
-    return d_res;
-}*/
+}
 
 
 
