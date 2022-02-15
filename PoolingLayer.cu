@@ -14,9 +14,9 @@ PoolingLayer::PoolingLayer(int input_size, int input_channel, int pool_size, int
     this->output_size = (input_size-pool_size)/stride+1;
     this->output_channel = input_channel;
     this->output_len = output_size * output_size * input_channel;
-    cudaMalloc(&this->activations, output_len * sizeof(int));
+    cudaMalloc(&this->activations, output_len * sizeof(float));
     cudaMalloc(&this->max_indexes, output_len * sizeof(int));
-    cudaMalloc(&this->unpooling, input_size * input_size * input_channel * sizeof(int));
+    cudaMalloc(&this->unpooling, input_size * input_size * input_channel * sizeof(float));
 }
 
 PoolingLayer::~PoolingLayer(){

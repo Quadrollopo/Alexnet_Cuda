@@ -14,7 +14,7 @@ public:
     int getOutputSize();
     int getOutputChannel();
     float *forward(float *image) override;
-    float* backpropagation(float* cost, float* back_neurons) override;
+    float *backpropagation(float* cost, float* back_neurons) override;
     void applyGradient(float lr) override;
     int getNeurons() override;
     int getNumBackNeurons() override;
