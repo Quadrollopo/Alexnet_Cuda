@@ -49,23 +49,23 @@ ConvLayer::ConvLayer(int input_size, int channels, int kernel_size, int kernel_n
 }
 
 float* ConvLayer::forward(float *image) {
-    auto res = convolution(image,
-                           this->weights,
-                           this->input_size,
-                           this->kernel_size,
-                           this->stride,
-                           this->pad,
-                           this->channels,
-                           this->kernel_num);
-    int res_len = (input_size-kernel_size+2*pad)/stride+1;
-    vector_sum(res, bias, res_len);
-    activation_func(res, res_len);
+    convolution(image,
+               this->weights,
+               this->activations,
+               this->input_size,
+               this->kernel_size,
+               this->stride,
+               this->pad,
+               this->channels,
+               this->kernel_num);
+    vector_sum(this->activations, bias, output_len  );
+    activation_func(this->activations, output_len);
 //    for(int i = 0; i < output_len; i++) {
 //        res[i] += bias[i];
 //        res[i] = activation_func(res[i]);
 //        activations[i] = res[i];
 //    }
-    return res;
+    return this->activations;
 }
 
 int ConvLayer::getInputSize() {

@@ -49,42 +49,29 @@ __global__ void convolution_CUDA(float *image, float *kernel, float *res, int im
  * @param stride
  * @param pad
  **/
-float* convolution(float *image, float *kernel, int image_size, int kernel_size, int stride, int pad, int image_ch, int kernel_ch) {
+void convolution(float *image, float *kernel, float *res, int image_size, int kernel_size, int stride, int pad, int image_ch, int kernel_ch) {
     if(kernel_size % 2 == 0){
         std::cout << "Filter size is not odd" << std::endl;
-        return nullptr;
+        return;
     }
     if(pad > (kernel_size-1)/2){
         std::cout << "Pad is too high" << std::endl;
-        return nullptr;
+        return;
     }
 
-    float *d_res;
     int res_dim = (image_size-kernel_size+2*pad)/stride+1;
-    float* res = new float[res_dim * res_dim * kernel_ch]();
+    cudaMemset(res, 0, res_dim * res_dim * kernel_ch * sizeof(float));
 
+    convolution_CUDA<<<dim3(res_dim, res_dim), dim3(kernel_size, kernel_size)>>>(image, kernel, res, image_size, kernel_size, stride, pad, res_dim, image_ch, kernel_ch);
 
-    cudaMalloc(&d_res, res_dim * res_dim * kernel_ch * sizeof(float));
-
-    cudaMemcpy(d_res, res, res_dim * res_dim * kernel_ch * sizeof(float), cudaMemcpyHostToDevice);
-
-    convolution_CUDA<<<dim3(res_dim, res_dim), dim3(kernel_size, kernel_size)>>>(image, kernel, d_res, image_size, kernel_size, stride, pad, res_dim, image_ch, kernel_ch);
-//
-    cudaMemcpy(res, d_res, res_dim * res_dim *  kernel_ch * sizeof(float), cudaMemcpyDeviceToHost);
-//
-//    cudaFree(d_res);
-
-    printf("convolution GPU:\n");
-    for(int i=0; i < kernel_ch; i++){
-        for(int j=0; j < res_dim * res_dim; j++)
-            printf("%d ", (int)res[i*res_dim*res_dim + j]);
-        printf("\n");
-    }
-    printf("\n\n\n");
-    delete[] res;
-
-
-    return d_res;
+//    printf("convolution GPU:\n");
+//    for(int i=0; i < kernel_ch; i++){
+//        for(int j=0; j < res_dim * res_dim; j++)
+//            printf("%d ", (int)res[i*res_dim*res_dim + j]);
+//        printf("\n");
+//    }
+//    printf("\n\n\n");
+//    delete[] res;
 }
 /*
 __global__ void convolution_backpropagation_CUDA(float *image, float *kernel, float *res, int image_size, int kernel_size, int stride, int pad, int res_dim,int image_ch, int kernel_ch) {

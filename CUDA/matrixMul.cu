@@ -7,7 +7,7 @@
 #include <cuda_runtime.h>
 #if CUDA
 
-__global__ void matrix_mul_CUDA(float *a, float *b, float *c, int a_row, int b_row, int b_col) {
+__global__ void matrix_mul_CUDA(float *a, float *b, float *c, int b_row, int b_col) {
 
     // Block index
     unsigned int bx = blockIdx.x;
