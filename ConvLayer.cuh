@@ -6,7 +6,6 @@ using namespace std;
 #include <memory>
 #include <random>
 #include <cuda_runtime.h>
-#include "CUDA_or_CPU.cuh"
 class ConvLayer: public Layer{
 public:
     ConvLayer(int input_size, int channels, int kernel_size, int kernel_num, int stride, bool pad, Act func);
@@ -30,6 +29,9 @@ private:
     int pad;
     int output_size;	// lato dell'output
 	int output_len; //output_size*output_size*kernel_num
+	float *current_bias_derivative;
+	float *current_weights_derivative;
+	float *prev_layer_derivative;
 };
 
 
