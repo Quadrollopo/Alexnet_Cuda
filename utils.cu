@@ -46,20 +46,35 @@ void  der_sigmoid_CUDA(float *f, float *res, int len){
     der_sigmoid<<<len, 1>>>(f, res, len);
 }
 
-__global__ void softmax(float *f, float sum, int len){
+__global__ void softmax(float *f, float *sum_max, int len){
     unsigned int bx = blockIdx.x*blockDim.x+threadIdx.x;
     if(bx < len){
         float x = exp(f[bx]);
-        atomicAdd(sum,x);
+        atomicAdd(&sum_max[0], x);
         __syncthreads();
-        f[bx] = x/(*sum);
+        f[bx] = x/(sum_max[0]);
+        __syncthreads();
+        if(bx == 0){
+            for(int i=0; i<len; i++)
+                if(f[i] > sum_max[1]) sum_max[1] = f[i];
+        }
+    }
+}
+
+__global__ void normalize(float *f, float *sum_max, int len){
+    unsigned int bx = blockIdx.x*blockDim.x+threadIdx.x;
+    if(bx < len){
+        f[bx] = f[bx]/(sum_max[1]);
     }
 }
 
 void Softmax_CUDA(float *f, int len){
-    float *sum;
-	cudaMalloc(&sum, sizeof(float));
-	cudaMemset(sum, 0, sizeof(float));
-	softmax<<<len, 1>>>(f, sum, len);
+    float *sum_max;
+	cudaMalloc(&sum_max, 2 * sizeof(float));
+	cudaMemset(sum_max, 0, 2 * sizeof(float));
+	softmax<<<len, 1>>>(f, sum_max, len);
+	normalize<<<len, 1>>>(f, sum_max, len);
+    cudaFree(sum_max);
 
 }
+
