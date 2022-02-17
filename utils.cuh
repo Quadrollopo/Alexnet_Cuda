@@ -1,7 +1,7 @@
 #ifndef ALEXNET_UTLIS_H
 #define ALEXNET_UTLIS_H
-#include "CUDA_or_CPU.cuh"
-
+#include <stdio.h>
+#include <iostream>
 //CUDA
 void reLU_CUDA(float *f, int len);
 void Heaviside_CUDA(float *f, float *res, int len);
@@ -9,26 +9,15 @@ void sigmoid_CUDA(float *f, int len);
 void der_sigmoid_CUDA(float *f, float *res, int len);
 void Softmax_CUDA(float *input, int len);
 
-static float reLU(float f){
-	return f > 0.0f ? f : 0.0f;
-}
-static float Heaviside(float f){
-    return f > 0.0f ? 1.0f : 0.0f;
-}
-static float sigmoid(float f){
-    return 1.f/ (1.f + exp(-f));
-}
-static float der_sigmoid(float f) {
-    return f * (1 - f);
-}
-static float* Softmax(float input[], int length){
-    float sum = 0;
-    for(int i = 0; i < length; i++) {
-        input[i] = exp(input[i]);
-        sum += input[i];
+static void print_CUD(const float* a, int len){
+	float *res = new float[len];
+    cudaMemcpy(res, a, len * sizeof(float), cudaMemcpyDeviceToHost);
+    for(int i=0; i < len; i++){
+		std::cout << res[i] << " ";
+		if(i % 10 == 9)
+			std::cout << std::endl;
     }
-    for(int i = 0; i < length; i++)
-        input[i] = input[i]/sum;
-    return input;
+	std::cout << std::endl;
+    delete[] res;
 }
 #endif

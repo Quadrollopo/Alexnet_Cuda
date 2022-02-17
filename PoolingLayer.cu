@@ -1,10 +1,7 @@
 #include "PoolingLayer.cuh"
 
-#include "utils.cuh"
 #include "CUDA/maxPooling.cuh"
-#include "CUDA/vectorSum.cuh"
-#include <random>
-#include <stdexcept>
+
 
 PoolingLayer::PoolingLayer(int input_size, int input_channel, int pool_size, int stride, Act func) : Layer(func) {
     this->input_size = input_size;

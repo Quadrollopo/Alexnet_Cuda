@@ -9,7 +9,6 @@
 #include <random>
 #include <stdexcept>
 #include <cuda_runtime.h>
-#include "CUDA_or_CPU.cuh"
 using namespace std;
 
 class FullLayer : public Layer{
@@ -25,7 +24,6 @@ private:
     float *neurons;
 	int num_neurons;
 	int num_back_neurons;
-    float *activation_derivative;
     float *current_bias_derivative;
     float *current_weights_derivative;
     float *prev_layer_derivative;

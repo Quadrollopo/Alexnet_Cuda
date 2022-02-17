@@ -14,7 +14,7 @@ Network::Network(int img_size, int channel, float lr) {
 	this->channels_init = channel;
 }
 
-void Network::addFullLayer(int neurons, Act func){
+Network* Network::addFullLayer(int neurons, Act func){
 	int back_neurons;
 	if (layers.empty()) {
 		back_neurons = input_size;
@@ -25,9 +25,10 @@ void Network::addFullLayer(int neurons, Act func){
 
 	layers.push_back(new FullLayer(neurons, back_neurons, func));
 	lastLayerType = full;
+	return this;
 }
 
-void Network::addConvLayer(int kern_size, int num_kernels, int stride, bool pad, Act func) {
+Network* Network::addConvLayer(int kern_size, int num_kernels, int stride, bool pad, Act func) {
 	int input_conv;
 	int channels;
 	if (layers.empty()) {
@@ -51,9 +52,10 @@ void Network::addConvLayer(int kern_size, int num_kernels, int stride, bool pad,
 	layers.push_back(
 			new ConvLayer(input_conv, channels, kern_size, num_kernels, stride, pad, func));
 	lastLayerType = conv;
+	return this;
 }
 
-void Network::addPoolLayer(int pool_size, int stride){
+Network* Network::addPoolLayer(int pool_size, int stride){
 	if(lastLayerType != conv){
 		cout << "cant add a pool layer to a non conv layer" << endl;
 		exit(-1);
@@ -64,68 +66,40 @@ void Network::addPoolLayer(int pool_size, int stride){
 	int channels = conv->getOutputChannel();
 	layers.push_back(
 			new PoolingLayer(input_conv, channels, pool_size, stride, pool));
-
+	return this;
 }
 
 float* Network::forward(float input[]) {
 	for (Layer *f : layers){
         float *new_input = f->forward(input);
-#if CUDA
-// cudaFree(input);
-#else
-        //delete[] input;
-#endif
 		input = new_input;
 	}
-	//input = (input,layers.back()->getNeurons());
 	return input;
 }
 
 
 void Network::train(const float output[], const float expected[], float input[]) {
-#if CUDA
 	//Define loss
-    float *cost;
-    cudaMalloc(&cost, getOutputSize() * sizeof(float));
-    vector_diff_alloc(output, expected, cost, getOutputSize());
-    vector_constant_mul(cost,2,getOutputSize());
-    float *tmp = cost;
+	float* cost;
+	cudaMalloc(&cost, getOutputSize() * sizeof(float));
+	loss_cross_entropy_der(output, expected, cost, getOutputSize());
+	float *tmp = cost;
 	for(int i=layers.size()-1; i>0; i--){
 		tmp = layers[i]->backpropagation(tmp, layers[i-1]->getActivations());
-        /*printf("Cost: \n");
-        for(int j=0; j<layers[i]->getNumBackNeurons();j++)
-            printf("%f ",cost[j]);
-        printf("\n");*/
 	}
 	layers[0]->backpropagation(cost, input);
 
     cudaFree(cost);
-#else
-    //Define loss
-	float* cost = new float[getOutputSize()];
-	for(int i=0; i<getOutputSize(); i++)
-		cost[i] = (output[i] - expected[i]) * 2;
-	for(int i=layers.size()-1; i>0; i--){
-		cost = layers[i]->backpropagation(cost, layers[i-1]->getActivations());
-        /*printf("Cost: \n");
-        for(int j=0; j<layers[i]->getNumBackNeurons();j++)
-            printf("%f ",cost[j]);
-        printf("\n");*/
-	}
-	cost = layers[0]->backpropagation(cost, input);
 
-    delete[] cost;
-#endif
 }
 
 int Network::getOutputSize() {
 	return layers.back()->getNeurons();
 }
 
-void Network::learn(float batch_size) {
-
+void Network::learn() {
 	for (Layer *f : layers){
-		f->applyGradient(lr/batch_size);
+		f->applyGradient(lr);
 	}
 }
 

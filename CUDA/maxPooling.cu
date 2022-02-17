@@ -1,9 +1,6 @@
-#include "convolution.cuh"
 #include <cuda_runtime.h>
-#include <iostream>
-#include <limits>
+#include "maxPooling.cuh"
 
-#if CUDA
 
 __global__ void max_pooling_CUDA(float *image, float *res, int *res2, int image_size, int pool_size, int stride,  int channel, int res_dim) {
 
@@ -68,27 +65,6 @@ void max_unpooling(float *max, int *max_indexes, float *res, int input_size, int
     max_unpooling_CUDA<<<dim3(input_size, input_size),channel>>>(max, max_indexes, res, input_size, channel);
 }
 
-float* max_pooling_CPU(float *image, int img_size, int pool_size, int stride, int channel) {
-    int res_size = (img_size - pool_size) / stride + 1;
-    float* res = new float [res_size * res_size];
-    for (int x=0, x_image=0; x < res_size; x++, x_image+=stride){
-        for (int y=0, y_image=0; y < res_size; y++, y_image+=stride) {
-            int res_index = x * res_size + y;
-            for (int i = 0; i < pool_size; i++) {
-                for (int j = 0; j < pool_size; j++) {
-                    int img_index = (x_image + i) * img_size + y_image + j;
-                    if(res[res_index] < image[img_index])
-                        res[res_index] = image[img_index];
-                }
-            }
-        }
-    }
-    return res;
-
-}
-
-
-#else
 
 __global__ void max_pooling_CUDA(float *image, float *res, int image_size, int pool_size, int stride,  int channel, int res_dim) {
 
@@ -174,6 +150,5 @@ float* max_pooling_CPU(float *image, int img_size, int pool_size, int stride, in
 }
 
 
-#endif
 
 

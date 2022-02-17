@@ -60,11 +60,3 @@ void Softmax_CUDA(float *f, int len){
     float sum = 0.f;
     softmax<<<len, 1>>>(f, sum, len);
 }
-
-void nope(float *f, int len){
-    int x = len;
-}
-
-float* nope_der(float *f, int len){
-    return f;
-}

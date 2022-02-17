@@ -1,11 +1,8 @@
-// System includes
-#include <stdio.h>
 
 // CUDA runtime
 #include "vectorSum.cuh"
 #include <cuda_runtime.h>
 
-#if CUDA
 __global__ void vector_sum_CUDA(float *a, float *b, int len){
     unsigned int id = blockIdx.x*blockDim.x+threadIdx.x;
 
@@ -15,13 +12,8 @@ __global__ void vector_sum_CUDA(float *a, float *b, int len){
 }
 
 
-void vector_sum(float *a, float *b, int len){
+void vector_sum(float *a, float *b,  int len){
     vector_sum_CUDA<<<len, 1>>>(a, b, len);
-
-//    for(int i=0; i < a_row * b_col; i++){
-//        printf("%f ", res[i]);
-//    }
-//    printf("\n\n\n\n");
 
 }
 
@@ -84,50 +76,27 @@ void vector_diff_alloc(const float *a, const float *b, float *c,  int len){
     vector_diff_alloc_CUDA<<<len, 1>>>(a, b,c, len);
 }
 
-#else
-__global__ void vector_sum_CUDA(float *a, float *b, int len){
-    int id = blockIdx.x*blockDim.x+threadIdx.x;
+__global__ void vector_conv_bias_CUDA(float *a, float *b, int num_sum){
+	unsigned int id = blockIdx.x*blockDim.x+threadIdx.x;
 
-    if (id < len)
-        a[id] += b[id];
+#pragma unroll
+	for(int i=0; i<num_sum; i++){
+		a[id] += b[i + id*num_sum];
+	}
+}
 
+void vector_conv_bias(float *a, float *b, int num_sum, int len_bias){
+	vector_conv_bias_CUDA<<<len_bias, 1>>>(a, b, num_sum);
+}
+
+__global__ void loss_cross_entropy_der_CUDA(const float *cost, const float* exp, float *res, int len){
+	unsigned int id = blockIdx.x*blockDim.x+threadIdx.x;
+	if (id < len){
+		res[id] = exp[id] * (1/cost[id]);
+	}
 }
 
 
-void vector_sum(float *a, float *b, int len){
-    float *d_a, *d_b;
-
-
-    cudaMalloc(&d_a, len * sizeof(float));
-    cudaMalloc(&d_b, len * sizeof(float));
-
-    cudaMemcpy(d_a, a, len * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_b, b, len * sizeof(float), cudaMemcpyHostToDevice);
-
-    vector_sum_CUDA<<<1, len>>>(d_a, d_b, len);
-
-    cudaMemcpy(a, d_a, len * sizeof(float), cudaMemcpyDeviceToHost);
-
-    cudaFree(d_a);
-    cudaFree(d_b);
-
-//    for(int i=0; i < a_row * b_col; i++){
-//        printf("%f ", res[i]);
-//    }
-//    printf("\n\n\n\n");
-
-
-    cudaDeviceReset();
+void loss_cross_entropy_der(const float *cost, const float* exp, float *res, int len){
+	loss_cross_entropy_der_CUDA<<<1, len>>>(cost, exp, res, len);
 }
-
-float* vector_sum_CPU(float *a, float *b, int len){
-    auto res = new float[len];
-    for (int i=0; i<len; i++){
-        res[i]=a[i] + b[i];
-    }
-    return res;
-}
-
-
-
-#endif
