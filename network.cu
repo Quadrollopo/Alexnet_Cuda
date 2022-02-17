@@ -83,14 +83,20 @@ void Network::train(const float output[], const float expected[], float input[])
 	float* cost;
 	cudaMalloc(&cost, getOutputSize() * sizeof(float));
 	loss_cross_entropy_der(output, expected, cost, getOutputSize());
+//	vector_diff_alloc(output, expected, cost, getOutputSize());
+//	vector_constant_mul(cost,2,getOutputSize());
 	float *tmp = cost;
 	for(int i=layers.size()-1; i>0; i--){
 		tmp = layers[i]->backpropagation(tmp, layers[i-1]->getActivations());
 	}
-	layers[0]->backpropagation(cost, input);
+	layers[0]->backpropagation(tmp, input);
 
-    cudaFree(cost);
+	cudaFree(cost);
 
+}
+
+void Network::decreaseLR(){
+	lr /= 10;
 }
 
 int Network::getOutputSize() {

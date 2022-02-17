@@ -27,7 +27,7 @@ public:
 	float* forward(float input[]);
 	void train(const float output[], const float expected[], float input[]);
 	void learn();
-
+	void decreaseLR();
 };
 
 
