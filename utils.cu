@@ -50,13 +50,16 @@ __global__ void softmax(float *f, float sum, int len){
     unsigned int bx = blockIdx.x*blockDim.x+threadIdx.x;
     if(bx < len){
         float x = exp(f[bx]);
-        atomicAdd(&sum,x);
+        atomicAdd(sum,x);
         __syncthreads();
-        f[bx] = x/sum;
+        f[bx] = x/(*sum);
     }
 }
 
 void Softmax_CUDA(float *f, int len){
-    float sum = 0.f;
-    softmax<<<len, 1>>>(f, sum, len);
+    float *sum;
+	cudaMalloc(&sum, sizeof(float));
+	cudaMemset(sum, 0, sizeof(float));
+	softmax<<<len, 1>>>(f, sum, len);
+
 }
