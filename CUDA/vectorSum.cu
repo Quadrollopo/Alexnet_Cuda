@@ -92,7 +92,7 @@ void vector_conv_bias(float *a, float *b, int num_sum, int len_bias){
 __global__ void loss_cross_entropy_der_CUDA(const float *cost, const float* exp, float *res, int len){
 	unsigned int id = blockIdx.x*blockDim.x+threadIdx.x;
 	if (id < len){
-		res[id] = exp[id] * (1/cost[id]);
+		res[id] = -exp[id] * (1/cost[id]);
 	}
 }
 
