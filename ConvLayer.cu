@@ -97,8 +97,6 @@ void ConvLayer::applyGradient(float lr) {
 }
 
 float *ConvLayer::backpropagation(float *cost, float *back_img) {
-	if(kernel_num == 16)
-		print_CUDA(cost, output_len);
 	derivative_func(activations, activation_derivative, output_len);
 	vector_mul(activation_derivative, cost, activation_derivative, output_len);
 //	vector_conv_bias(bias_derivative, activation_derivative, output_size*output_size, kernel_num);
