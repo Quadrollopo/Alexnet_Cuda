@@ -9,15 +9,6 @@ void sigmoid_CUDA(float *f, int len);
 void der_sigmoid_CUDA(float *f, float *res, int len);
 void Softmax_CUDA(float *input, int len);
 
-static void print_CUD(const float* a, int len){
-	float *res = new float[len];
-    cudaMemcpy(res, a, len * sizeof(float), cudaMemcpyDeviceToHost);
-    for(int i=0; i < len; i++){
-		std::cout << res[i] << " ";
-		if(i % 10 == 9)
-			std::cout << std::endl;
-    }
-	std::cout << std::endl;
-    delete[] res;
-}
+void print_CUDA(const float* a, int len);
+void save_CUDA(const float* a, int len, int size, int z);
 #endif

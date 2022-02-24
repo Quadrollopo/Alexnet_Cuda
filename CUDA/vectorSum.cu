@@ -89,14 +89,25 @@ void vector_conv_bias(float *a, float *b, int num_sum, int len_bias){
 	vector_conv_bias_CUDA<<<len_bias, 1>>>(a, b, num_sum);
 }
 
-__global__ void loss_cross_entropy_der_CUDA(const float *cost, const float* exp, float *res, int len){
+__global__ void loss_cross_entropy_der_CUDA(const float *out, const float* exp, float *res, int len){
 	unsigned int id = blockIdx.x*blockDim.x+threadIdx.x;
 	if (id < len){
-		res[id] = -exp[id] * (1/cost[id]);
+		res[id] = (-1.f/(float)len) * ((exp[id]/(out[id] + 1e-10f)) - ((1 - exp[id])/(1 - out[id] + 1e-10f)));
 	}
 }
 
 
 void loss_cross_entropy_der(const float *cost, const float* exp, float *res, int len){
 	loss_cross_entropy_der_CUDA<<<1, len>>>(cost, exp, res, len);
+}
+
+
+__global__ void vector_bias_sum_CUDA(float *a, float *b){
+	unsigned int id = blockIdx.x+blockDim.x*threadIdx.x;
+
+	a[id] += b[threadIdx.x];
+}
+
+void vector_bias_sum(float *a, float *b,  int len, int num_bias){
+	vector_bias_sum_CUDA<<<len, num_bias>>>(a,b);
 }

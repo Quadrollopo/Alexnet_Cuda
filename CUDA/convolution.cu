@@ -49,15 +49,15 @@ __global__ void convolution_weights_CUDA(
 		float *image, float *kernel, float *res, int image_size, int kernel_size, int stride, int pad, int res_dim, int image_ch, int num_kernel) {
 
 	// Block index
-	unsigned int bx = blockIdx.x;
-	unsigned int by = blockIdx.y;
+	int bx = blockIdx.x;
+	int by = blockIdx.y;
 
 	// Thread index
-	unsigned int tx = threadIdx.x;
-	unsigned int ty = threadIdx.y;
+	int tx = threadIdx.x;
+	int ty = threadIdx.y;
 	if(tx * kernel_size + ty < kernel_size * kernel_size) {
-		int x_image = bx * stride - pad + tx;
-		int y_image = by * stride - pad + ty;
+		int x_image = tx * stride - pad + bx;
+		int y_image = ty * stride - pad + by;
 
 
 		float z;
@@ -112,7 +112,7 @@ void convolution_weights(float *image, float *kernel, float *res, int image_size
 		return;
 	}
 
-	int res_dim = (image_size-kernel_size+2*pad)/stride+1;
+	int res_dim = (image_size-(stride * (kernel_size - 1) + 1)+2*pad)+1;
 	cudaMemset(res, 0, res_dim * res_dim * num_kern * image_ch * sizeof(float));
 	convolution_weights_CUDA<<<dim3(res_dim, res_dim), dim3(kernel_size, kernel_size)>>>
 	(image, kernel, res, image_size, kernel_size, stride, pad, res_dim, image_ch, num_kern);
@@ -162,20 +162,17 @@ __global__ void convolution_prevlayer_backpropagation_CUDA(float *cost, float *k
 void convolution_prevlayer_backpropagation(float *cost, float *kernel, float *res, int cost_size, int kernel_size, int prevlayer_size, int kernel_ch, int prevlayer_ch){
     cudaMemset(res, 0, prevlayer_size * prevlayer_size * prevlayer_ch * sizeof(float));
     int edge = (prevlayer_size - cost_size)/2;
-    convolution_prevlayer_backpropagation_CUDA<<<dim3(prevlayer_size, prevlayer_size), dim3(kernel_size, kernel_size)>>>(cost,
-                                                                                                                         kernel,
-                                                                                                                         res,
-                                                                                                                         cost_size,
-                                                                                                                         kernel_size,
-                                                                                                                         edge,
-                                                                                                                         prevlayer_size,
-                                                                                                                         prevlayer_ch,
-                                                                                                                         kernel_ch);
+    convolution_prevlayer_backpropagation_CUDA<<<dim3(prevlayer_size, prevlayer_size), dim3(kernel_size, kernel_size)>>>(
+			cost,
+			kernel,
+			res,
+			cost_size,
+			kernel_size,
+			edge,
+			prevlayer_size,
+			prevlayer_ch,
+			kernel_ch);
 
-    int res_dim = prevlayer_size;
-    float *ress = new float[res_dim*res_dim*prevlayer_ch];
-    cudaMemcpy(ress, res, res_dim*res_dim*prevlayer_ch * sizeof(float), cudaMemcpyDeviceToHost);
-    delete[] ress;
 
 }
 

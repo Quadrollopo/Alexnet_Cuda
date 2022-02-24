@@ -117,7 +117,7 @@ float* matrix_mul_CPU(float *a, float *b, int a_row, int b_row, int b_col) {
         for(int j=0; j < b_col; j++)
             for(int k = 0; k < b_row; k++)
                 res[i*b_col+j] += a[i*b_row+k] * b[k*b_col+j] ;
-
+	return res;
 }
 
 __global__ void matrix_mul_CUDA4(float *a, float *b, float *c, int b_row, int b_col) {

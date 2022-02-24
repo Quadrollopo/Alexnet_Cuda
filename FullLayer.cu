@@ -8,7 +8,8 @@ FullLayer::FullLayer(int n_neurons, int linked_neurons, Act func) : Layer(func){
     this->num_back_neurons = linked_neurons;
     this->num_weights = n_neurons*linked_neurons;
     std::random_device generator;
-    std::uniform_real_distribution<float> weights_rand = std::uniform_real_distribution<float>(0.0f, 0.1f);
+	std::normal_distribution<float> weights_rand =
+			std::normal_distribution<float>(0.f, sqrt(2.f/(float)linked_neurons));
     float * tmp_weights = new float[num_weights];
     for (int i=0; i<num_weights; i++){
         tmp_weights[i] = weights_rand(generator);
@@ -23,8 +24,8 @@ FullLayer::FullLayer(int n_neurons, int linked_neurons, Act func) : Layer(func){
     cudaMemset(this->weights_derivative,0,num_weights * sizeof(float));
     cudaMalloc(&this->activations,n_neurons * sizeof(float));
     cudaMalloc(&this->bias,n_neurons * sizeof(float));
-    cudaMemset(this->bias,0,n_neurons * sizeof(float));
-    cudaMalloc(&this->bias_derivative,n_neurons * sizeof(float));
+	cudaMemset(this->bias,0,n_neurons * sizeof(float));
+	cudaMalloc(&this->bias_derivative,n_neurons * sizeof(float));
     cudaMemset(this->bias_derivative,0,n_neurons * sizeof(float));
     cudaMalloc(&this->neurons,n_neurons * sizeof(float));
     cudaMalloc(&this->current_weights_derivative,num_weights * sizeof(float));
@@ -71,24 +72,24 @@ float* FullLayer::backpropagation(float* cost, float* back_neurons) {
     derivative_func(activations, activation_derivative, getNeurons());
     vector_mul(activation_derivative,cost,current_bias_derivative,num_neurons);
     vector_sum(bias_derivative,current_bias_derivative,getNeurons());
-    matrix_mul3(back_neurons,
+
+	matrix_mul(back_neurons,
                current_bias_derivative,
                current_weights_derivative,
                this->getNumBackNeurons(),
                1,
                this->getNeurons());
-    matrix_mul3(this->weights,
+	matrix_mul(this->weights,
                current_bias_derivative,
                prev_layer_derivative,
                this->getNumBackNeurons(),
                this->getNeurons(),
                1);
     vector_sum(this->weights_derivative,current_weights_derivative,num_weights);
-    return prev_layer_derivative;
+	return prev_layer_derivative;
 }
 
 void FullLayer::applyGradient(float lr) {
-
     vector_constant_mul(this->weights_derivative,lr,num_weights);
     vector_diff(weights,weights_derivative,num_weights);
     vector_constant_mul(bias_derivative,lr,num_neurons);

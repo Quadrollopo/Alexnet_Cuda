@@ -9,6 +9,7 @@ void vector_diff(float *a, float *b, int len);
 void vector_diff_alloc(const float *a, const float *b, float *c,  int len);
 void loss_cross_entropy_der(const float *cost, const float* exp, float *res, int len);
 void vector_conv_bias(float *a, float *b, int num_sum, int len);
+void vector_bias_sum(float *a, float *b,  int len, int num_bias);
 
 
 #endif

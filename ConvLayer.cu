@@ -18,29 +18,30 @@ ConvLayer::ConvLayer(int input_size, int channels, int kernel_size, int kernel_n
     this->output_size = ((input_size-kernel_size+2*pad)/stride+1);
     this->output_len = output_size*output_size*kernel_num;
     this->num_weights = kernel_size*kernel_size*channels*kernel_num;
-
     std::random_device generator;
-    std::uniform_real_distribution<float> weights_rand = std::uniform_real_distribution<float>(0.0f, 0.1f);
+	std::normal_distribution<float> weights_rand =
+			std::normal_distribution<float>(0.f, sqrt(2.f/(float)(input_size*input_size*channels)));
     float * tmp_weights = new float[num_weights];
     for (int i=0; i<num_weights; i++){
         tmp_weights[i] = weights_rand(generator);
-//		weights[i] = 1.0f;
     }
+
     cudaMalloc(&this->weights,num_weights * sizeof(float));
     cudaMemcpy(this->weights, tmp_weights, num_weights * sizeof(float), cudaMemcpyHostToDevice);
-    delete[] tmp_weights;
+	if(kernel_size == 7)
+		save_CUDA(weights, num_weights, kernel_size, 0);
+	delete[] tmp_weights;
 
+	cudaMalloc(&this->bias,this->kernel_num * sizeof(float));
+	cudaMalloc(&this->bias_derivative,this->kernel_num * sizeof(float));
     cudaMalloc(&this->weights_derivative,num_weights * sizeof(float));
     cudaMalloc(&this->current_weights_derivative,num_weights * sizeof(float));
     cudaMalloc(&this->prev_layer_derivative,input_size*input_size*channels * sizeof(float));
-    cudaMemset(&this->weights_derivative,0,num_weights * sizeof(float));
-    cudaMalloc(&this->activations,output_len * sizeof(float));
-    cudaMalloc(&this->bias,kernel_num * sizeof(float));
-    cudaMemset(&this->bias,0,kernel_num * sizeof(float));
-    cudaMalloc(&this->bias_derivative,kernel_num * sizeof(float));
-    cudaMemset(&this->bias_derivative,0,kernel_num * sizeof(float));
 	cudaMalloc(&this->activation_derivative,output_len * sizeof(float));
-
+    cudaMalloc(&this->activations,output_len * sizeof(float));
+    cudaMemset(this->weights_derivative,0,num_weights * sizeof(float));
+	cudaMemset(this->bias,0,kernel_num * sizeof(float));
+    cudaMemset(this->bias_derivative,0,this->kernel_num * sizeof(float));
 }
 
     ConvLayer::~ConvLayer(){
@@ -64,7 +65,7 @@ float* ConvLayer::forward(float *image) {
                this->channels,
                this->kernel_num);
 
-	vector_sum(this->activations, bias, output_len);
+//	vector_bias_sum(this->activations, bias, output_size*output_size, kernel_num);
     activation_func(this->activations, output_len);
     return this->activations;
 }
@@ -92,12 +93,17 @@ void ConvLayer::applyGradient(float lr) {
 	vector_diff(bias,bias_derivative,kernel_num);
 	cudaMemset(this->weights_derivative,0,num_weights * sizeof(float));
 	cudaMemset(this->bias_derivative,0,kernel_num * sizeof(float));
+	save_CUDA(weights, num_weights, kernel_size, kernel_size);
 }
 
 float *ConvLayer::backpropagation(float *cost, float *back_img) {
+	if(kernel_num == 16)
+		print_CUDA(cost, output_len);
 	derivative_func(activations, activation_derivative, output_len);
 	vector_mul(activation_derivative, cost, activation_derivative, output_len);
-	vector_conv_bias(bias_derivative, activation_derivative, output_size*output_size, kernel_num);
+//	vector_conv_bias(bias_derivative, activation_derivative, output_size*output_size, kernel_num);
+	cudaMemset(current_weights_derivative, 0, num_weights * sizeof(float));
+
 	convolution_weights(back_img,
 						activation_derivative,
 						current_weights_derivative,
@@ -107,6 +113,7 @@ float *ConvLayer::backpropagation(float *cost, float *back_img) {
 						pad,
 						channels,
 						kernel_num);
+
 
 	vector_sum(weights_derivative, current_weights_derivative, num_weights);
 

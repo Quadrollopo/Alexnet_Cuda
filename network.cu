@@ -44,9 +44,17 @@ Network* Network::addConvLayer(int kern_size, int num_kernels, int stride, bool 
 			std::cout << "Cant add a convolutional layer to a full layer" << std::endl;
 			exit(-1);
 		}
-		ConvLayer* conv = (ConvLayer*)layers.back();
-		input_conv = conv->getOutputSize();
-		channels = conv->getOutputChannel();
+		if(lastLayerType == conv) {
+			ConvLayer *conv = (ConvLayer *) layers.back();
+			input_conv = conv->getOutputSize();
+			channels = conv->getOutputChannel();
+		}
+		else {
+			PoolingLayer *conv = (PoolingLayer *) layers.back();
+			input_conv = conv->getOutputSize();
+			channels = conv->getOutputChannel();
+		}
+
 	}
 
 	layers.push_back(
@@ -66,6 +74,7 @@ Network* Network::addPoolLayer(int pool_size, int stride){
 	int channels = conv->getOutputChannel();
 	layers.push_back(
 			new PoolingLayer(input_conv, channels, pool_size, stride, pool));
+	lastLayerType = maxPool;
 	return this;
 }
 
@@ -83,6 +92,8 @@ void Network::train(const float output[], const float expected[], float input[])
 	float* cost;
 	cudaMalloc(&cost, getOutputSize() * sizeof(float));
 	loss_cross_entropy_der(output, expected, cost, getOutputSize());
+//	vector_diff_alloc(output, expected, cost, getOutputSize());
+//	vector_constant_mul(cost,2,getOutputSize());
 	float *tmp = cost;
 	for(int i=layers.size()-1; i>0; i--){
 		tmp = layers[i]->backpropagation(tmp, layers[i-1]->getActivations());
@@ -94,7 +105,7 @@ void Network::train(const float output[], const float expected[], float input[])
 }
 
 void Network::decreaseLR(){
-	lr /= 10;
+	lr /= 5;
 }
 
 int Network::getOutputSize() {

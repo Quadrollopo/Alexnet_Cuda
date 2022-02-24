@@ -15,7 +15,7 @@ class Network {
 	int input_size;
 	int channels_init;
 	float lr;
-	enum layer_type{full, conv};
+	enum layer_type{full, conv, maxPool};
 	layer_type lastLayerType;
 	int getOutputSize();
 public:

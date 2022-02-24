@@ -35,7 +35,7 @@ float* PoolingLayer::forward(float *image) {
 }
 
 float* PoolingLayer::backpropagation(float* cost, float* back_neurons){
-    max_unpooling(activations,
+    max_unpooling(cost,
                   max_indexes,
                   unpooling,
                   output_size, //we are going backward
