@@ -28,8 +28,6 @@ ConvLayer::ConvLayer(int input_size, int channels, int kernel_size, int kernel_n
 
     cudaMalloc(&this->weights,num_weights * sizeof(float));
     cudaMemcpy(this->weights, tmp_weights, num_weights * sizeof(float), cudaMemcpyHostToDevice);
-	if(kernel_size == 7)
-		save_CUDA(weights, num_weights, kernel_size, 0);
 	delete[] tmp_weights;
 
 	cudaMalloc(&this->bias,this->kernel_num * sizeof(float));

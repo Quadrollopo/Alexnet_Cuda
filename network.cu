@@ -105,7 +105,7 @@ void Network::train(const float output[], const float expected[], float input[])
 }
 
 void Network::decreaseLR(){
-	lr /= 5;
+	lr /= 10;
 }
 
 int Network::getOutputSize() {
