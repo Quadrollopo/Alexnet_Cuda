@@ -112,7 +112,6 @@ float *ConvLayer::backpropagation(float *cost, float *back_img) {
 						channels,
 						kernel_num);
 
-
 	vector_sum(weights_derivative, current_weights_derivative, num_weights);
 
 	convolution_prevlayer_backpropagation(activation_derivative,
@@ -120,7 +119,7 @@ float *ConvLayer::backpropagation(float *cost, float *back_img) {
 			prev_layer_derivative,
 			this->output_size,
 			this->kernel_size,
-			kernel_size - 1,
+			input_size,
 			kernel_num,
 			channels);
 
